@@ -1,0 +1,14 @@
+{
+  "task_id": "S31",
+  "title": "Add/update card details",
+  "definition_of_done": [
+    "Owner can submit payment method details.",
+    "UI confirms stored card summary (masked last 4)."
+  ],
+  "required_evidence": {
+    "playwright": {
+      "tag": "@S31",
+      "video_required": true
+    }
+  }
+}

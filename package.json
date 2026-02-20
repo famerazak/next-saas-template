@@ -1,0 +1,14 @@
+{
+  "name": "next-saas-template",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Harness-driven SaaS starter with per-slice UI evidence",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "task_id": "S02",
+  "title": "User can create account",
+  "definition_of_done": [
+    "Signup form accepts user input.",
+    "Successful submit shows account creation confirmation."
+  ],
+  "required_evidence": {
+    "playwright": {
+      "tag": "@S02",
+      "video_required": true
+    }
+  }
+}

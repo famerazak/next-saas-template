@@ -1,0 +1,14 @@
+{
+  "task_id": "S14",
+  "title": "Change member role",
+  "definition_of_done": [
+    "Admin user can select a new member role.",
+    "Applying the role change updates the rendered role state."
+  ],
+  "required_evidence": {
+    "playwright": {
+      "tag": "@S14",
+      "video_required": true
+    }
+  }
+}

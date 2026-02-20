@@ -1,0 +1,14 @@
+{
+  "task_id": "S35",
+  "title": "Idempotent webhook behavior",
+  "definition_of_done": [
+    "Processing a webhook event once mutates state once.",
+    "Processing the same event again is treated as duplicate."
+  ],
+  "required_evidence": {
+    "playwright": {
+      "tag": "@S35",
+      "video_required": true
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "task_id": "S01",
+  "title": "Public auth pages render",
+  "definition_of_done": [
+    "/login renders with a visible auth form.",
+    "/signup renders with a visible auth form.",
+    "/forgot-password renders with a visible auth form."
+  ],
+  "required_evidence": {
+    "playwright": {
+      "tag": "@S01",
+      "video_required": true
+    }
+  }
+}

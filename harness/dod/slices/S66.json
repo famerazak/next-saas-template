@@ -1,0 +1,14 @@
+{
+  "task_id": "S66",
+  "title": "GA gated by consent state",
+  "definition_of_done": [
+    "Analytics status starts disabled by default.",
+    "Accept/reject consent toggles analytics enabled state."
+  ],
+  "required_evidence": {
+    "playwright": {
+      "tag": "@S66",
+      "video_required": true
+    }
+  }
+}

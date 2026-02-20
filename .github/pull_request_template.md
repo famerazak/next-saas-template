@@ -13,3 +13,5 @@ Describe the change and affected task IDs.
 - [ ] Supervisor harness checks pass for blocking profiles.
 - [ ] Advisory warnings reviewed (if any).
 - [ ] Escalation report addressed (if any).
+- [ ] Each implemented slice has a matching DoD contract in `harness/dod/slices/<TASK_ID>.json`.
+- [ ] Each implemented slice has a Playwright test tagged `@<TASK_ID>` with uploaded video evidence.

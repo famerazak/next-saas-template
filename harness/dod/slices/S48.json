@@ -1,0 +1,14 @@
+{
+  "task_id": "S48",
+  "title": "Platform routes + nav visibility",
+  "definition_of_done": [
+    "Platform navigation is hidden for non-platform roles.",
+    "Platform navigation appears for PlatformAdmin role."
+  ],
+  "required_evidence": {
+    "playwright": {
+      "tag": "@S48",
+      "video_required": true
+    }
+  }
+}

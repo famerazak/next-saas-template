@@ -1,0 +1,14 @@
+{
+  "task_id": "S52",
+  "title": "Platform can edit tenant member roles",
+  "definition_of_done": [
+    "Platform admin can select a target tenant role.",
+    "Saving role change requires a reason and reflects result in UI."
+  ],
+  "required_evidence": {
+    "playwright": {
+      "tag": "@S52",
+      "video_required": true
+    }
+  }
+}

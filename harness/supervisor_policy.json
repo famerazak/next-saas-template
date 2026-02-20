@@ -23,7 +23,14 @@
   "profiles": {
     "safe-baseline": {
       "blocking": false,
-      "gates": ["typecheck", "lint", "unit", "security-lite"]
+      "gates": [
+        "typecheck",
+        "lint",
+        "unit",
+        "dod-contract",
+        "slice-ui-evidence",
+        "security-lite"
+      ]
     },
     "auth-rbac": {
       "blocking": true,
@@ -73,6 +80,16 @@
     "unit": {
       "command": "python3 -m unittest discover -s harness/tests -p 'test_*.py'",
       "timeout_seconds": 300
+    },
+    "dod-contract": {
+      "command": "python3 -m harness.scripts.dod_check",
+      "timeout_seconds": 60,
+      "blocking": true
+    },
+    "slice-ui-evidence": {
+      "command": "python3 -m harness.scripts.run_slice_playwright",
+      "timeout_seconds": 1200,
+      "blocking": true
     },
     "security-lite": {
       "command": "python3 harness/scripts/security_lite_check.py",

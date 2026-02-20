@@ -35,9 +35,19 @@ def _filter_target_tasks(tasks, task_source: str, policy: dict, task_ids: list[s
     return [task for task in open_tasks if task.id in pilot_ids]
 
 
-def _status_for_profile_failure(status: str, has_blocking_profile: bool) -> tuple[bool, bool]:
+def _status_for_profile_failure(
+    status: str,
+    has_blocking_profile: bool,
+    failed_gates: list[str],
+    policy: dict,
+) -> tuple[bool, bool]:
     if status == "passed":
         return (False, False)
+    has_blocking_gate_failure = any(
+        bool(policy["gates"].get(gate_id, {}).get("blocking", False)) for gate_id in failed_gates
+    )
+    if has_blocking_gate_failure:
+        return (True, False)
     if has_blocking_profile:
         return (True, False)
     return (False, True)
@@ -63,10 +73,20 @@ def run_supervisor(args: argparse.Namespace) -> int:
 
         resolution = resolve_profiles(task.tags, policy)
         gate_ids = resolve_gates(resolution.profiles, policy)
+        task_artifact_root = str((Path(args.artifacts_dir) / run_id).resolve())
+        gate_env = {
+            "HARNESS_RUN_ID": run_id,
+            "HARNESS_TASK_ID": task.id,
+            "HARNESS_TASK_TITLE": task.title,
+            "HARNESS_TASK_TAGS": ",".join(task.tags),
+            "HARNESS_TASK_SOURCE_LINE": str(task.source_line),
+            "HARNESS_ARTIFACTS_DIR": str(Path(args.artifacts_dir).resolve()),
+            "HARNESS_TASK_ARTIFACT_DIR": task_artifact_root,
+        }
 
         def _run_gate(gate_id: str, attempt: int):
             gate_cfg = policy["gates"][gate_id]
-            return run_gate(gate_id, gate_cfg, attempt)
+            return run_gate(gate_id, gate_cfg, attempt, extra_env=gate_env)
 
         status, attempt, failed_gates, gate_results, transitions = run_with_retries(
             gate_ids, max_retries, _run_gate
@@ -110,7 +130,12 @@ def run_supervisor(args: argparse.Namespace) -> int:
             gate.log_ref = refs["markdown"]
 
         has_blocking_profile = len(resolution.blocking_profiles) > 0
-        blocking, advisory = _status_for_profile_failure(status, has_blocking_profile)
+        blocking, advisory = _status_for_profile_failure(
+            status=status,
+            has_blocking_profile=has_blocking_profile,
+            failed_gates=failed_gates,
+            policy=policy,
+        )
         if blocking:
             blocking_failures += 1
         if advisory:

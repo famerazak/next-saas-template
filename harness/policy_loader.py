@@ -69,3 +69,5 @@ def validate_policy(policy: dict[str, Any]) -> None:
     for gate_id, gate_cfg in policy["gates"].items():
         if not gate_cfg.get("command"):
             raise PolicyError(f"gates.{gate_id}.command is required")
+        if "blocking" in gate_cfg and not isinstance(gate_cfg["blocking"], bool):
+            raise PolicyError(f"gates.{gate_id}.blocking must be a boolean when set")

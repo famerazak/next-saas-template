@@ -1,0 +1,14 @@
+{
+  "task_id": "S07",
+  "title": "Basic profile settings",
+  "definition_of_done": [
+    "Profile form is editable by current user.",
+    "Saving updates reflects the new profile value in the UI."
+  ],
+  "required_evidence": {
+    "playwright": {
+      "tag": "@S07",
+      "video_required": true
+    }
+  }
+}

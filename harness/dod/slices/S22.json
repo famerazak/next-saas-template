@@ -1,0 +1,14 @@
+{
+  "task_id": "S22",
+  "title": "User can enroll in 2FA",
+  "definition_of_done": [
+    "User can begin enrollment from security UI.",
+    "Enrollment can progress to an enrolled state through verification."
+  ],
+  "required_evidence": {
+    "playwright": {
+      "tag": "@S22",
+      "video_required": true
+    }
+  }
+}
