@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "retry": {
+    "max_retries": 3
+  },
+  "defaults": {
+    "default_profile": "safe-baseline"
+  },
+  "tags_to_profiles": {
+    "auth": ["auth-rbac"],
+    "rbac": ["auth-rbac"],
+    "billing": ["billing-payments"],
+    "webhook": ["webhook-reliability"],
+    "platform": ["platform-admin"],
+    "security": ["security-hardening"],
+    "deploy": ["security-hardening"],
+    "storage": ["storage-data"],
+    "analytics": ["analytics-legal"],
+    "ui": ["safe-baseline"],
+    "app": ["safe-baseline"],
+    "infra": ["safe-baseline"]
+  },
+  "profiles": {
+    "safe-baseline": {
+      "blocking": false,
+      "gates": ["typecheck", "lint", "unit", "security-lite"]
+    },
+    "auth-rbac": {
+      "blocking": true,
+      "extends": ["safe-baseline"],
+      "gates": ["auth-flow-tests", "permission-matrix-tests"]
+    },
+    "billing-payments": {
+      "blocking": true,
+      "extends": ["safe-baseline"],
+      "gates": ["billing-integration-tests", "owner-authz-tests"]
+    },
+    "webhook-reliability": {
+      "blocking": true,
+      "extends": ["safe-baseline"],
+      "gates": ["signature-verification-tests", "idempotency-tests", "retry-dead-letter-tests"]
+    },
+    "platform-admin": {
+      "blocking": true,
+      "extends": ["safe-baseline"],
+      "gates": ["platform-route-visibility-tests", "reason-required-action-tests"]
+    },
+    "security-hardening": {
+      "blocking": true,
+      "extends": ["safe-baseline"],
+      "gates": ["headers-csp-tests", "sensitive-logging-tests", "env-validation-tests"]
+    },
+    "storage-data": {
+      "blocking": false,
+      "extends": ["safe-baseline"],
+      "gates": ["tenant-isolation-tests", "signed-url-tests"]
+    },
+    "analytics-legal": {
+      "blocking": false,
+      "extends": ["safe-baseline"],
+      "gates": ["consent-gating-tests", "pii-payload-tests"]
+    }
+  },
+  "gates": {
+    "typecheck": {
+      "command": "python3 -m compileall harness",
+      "timeout_seconds": 300
+    },
+    "lint": {
+      "command": "python3 harness/scripts/lint_check.py",
+      "timeout_seconds": 300
+    },
+    "unit": {
+      "command": "python3 -m unittest discover -s harness/tests -p 'test_*.py'",
+      "timeout_seconds": 300
+    },
+    "security-lite": {
+      "command": "python3 harness/scripts/security_lite_check.py",
+      "timeout_seconds": 300
+    },
+    "auth-flow-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_auth_rbac",
+      "timeout_seconds": 300
+    },
+    "permission-matrix-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_auth_rbac",
+      "timeout_seconds": 300
+    },
+    "billing-integration-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_billing_webhook",
+      "timeout_seconds": 300
+    },
+    "owner-authz-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_billing_webhook",
+      "timeout_seconds": 300
+    },
+    "signature-verification-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_billing_webhook",
+      "timeout_seconds": 300
+    },
+    "idempotency-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_billing_webhook",
+      "timeout_seconds": 300
+    },
+    "retry-dead-letter-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_billing_webhook",
+      "timeout_seconds": 300
+    },
+    "platform-route-visibility-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_platform",
+      "timeout_seconds": 300
+    },
+    "reason-required-action-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_platform",
+      "timeout_seconds": 300
+    },
+    "headers-csp-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_security",
+      "timeout_seconds": 300
+    },
+    "sensitive-logging-tests": {
+      "command": "python3 harness/scripts/security_lite_check.py",
+      "timeout_seconds": 300
+    },
+    "env-validation-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_security",
+      "timeout_seconds": 300
+    },
+    "tenant-isolation-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_storage_analytics",
+      "timeout_seconds": 300
+    },
+    "signed-url-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_storage_analytics",
+      "timeout_seconds": 300
+    },
+    "consent-gating-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_storage_analytics",
+      "timeout_seconds": 300
+    },
+    "pii-payload-tests": {
+      "command": "python3 -m unittest harness.tests.test_domain_storage_analytics",
+      "timeout_seconds": 300
+    }
+  },
+  "pilot": {
+    "include_task_ids": [
+      "S01",
+      "S07",
+      "S02",
+      "S14",
+      "S31",
+      "S35",
+      "S48",
+      "S52",
+      "S22",
+      "S66"
+    ]
+  }
+}
