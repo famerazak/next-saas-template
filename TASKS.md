@@ -25,7 +25,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S04 - User can log in and log out**
   - Session lifecycle works; auth state reflected in nav.
 
-- [ ] **S05 - Protected routing baseline**
+- [x] **S05 - Protected routing baseline**
   - Unauthenticated users are redirected from app routes to `/login`.
 
 - [ ] **S06 - Dashboard shell with real user/tenant context**
