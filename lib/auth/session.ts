@@ -10,6 +10,8 @@ export type AppSession = {
   tenantId?: string;
   tenantName?: string;
   role?: TenantRole;
+  fullName?: string;
+  jobTitle?: string;
 };
 
 function encodeSession(session: AppSession): string {

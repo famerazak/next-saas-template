@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { setAppSession } from "@/lib/auth/session";
+import { loadProfileForUser } from "@/lib/profile/store";
 import { getSupabaseEnv } from "@/lib/supabase/config";
 import {
   deriveTenantContextFromEmail,
@@ -109,13 +110,17 @@ export async function POST(request: Request) {
     );
   }
 
+  const profile = await loadProfileForUser(data.user.id);
+
   const response = NextResponse.json(
     {
       userId: data.user.id,
       redirectTo: "/dashboard",
       tenantId: tenant.tenantId,
       tenantName: tenant.tenantName,
-      role: tenant.role
+      role: tenant.role,
+      fullName: profile?.fullName ?? "",
+      jobTitle: profile?.jobTitle ?? ""
     },
     { status: 200 }
   );
@@ -124,7 +129,9 @@ export async function POST(request: Request) {
     email: data.user.email,
     tenantId: tenant.tenantId,
     tenantName: tenant.tenantName,
-    role: tenant.role
+    role: tenant.role,
+    fullName: profile?.fullName ?? "",
+    jobTitle: profile?.jobTitle ?? ""
   });
   return response;
 }

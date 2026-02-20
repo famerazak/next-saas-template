@@ -48,7 +48,9 @@ export async function POST(request: Request) {
         redirectTo: "/dashboard",
         tenantId: tenant.tenantId,
         tenantName: tenant.tenantName,
-        role: tenant.role
+        role: tenant.role,
+        fullName: "",
+        jobTitle: ""
       },
       { status: 201 }
     );
@@ -57,7 +59,9 @@ export async function POST(request: Request) {
       email: parsed.email,
       tenantId: tenant.tenantId,
       tenantName: tenant.tenantName,
-      role: tenant.role
+      role: tenant.role,
+      fullName: "",
+      jobTitle: ""
     });
     return response;
   }
@@ -136,7 +140,9 @@ export async function POST(request: Request) {
       redirectTo: "/dashboard",
       tenantId: bootstrap.tenantId,
       tenantName: bootstrap.tenantName,
-      role: bootstrap.role
+      role: bootstrap.role,
+      fullName: "",
+      jobTitle: ""
     },
     { status: 201 }
   );
@@ -145,7 +151,9 @@ export async function POST(request: Request) {
     email: data.user.email,
     tenantId: bootstrap.tenantId,
     tenantName: bootstrap.tenantName,
-    role: bootstrap.role
+    role: bootstrap.role,
+    fullName: "",
+    jobTitle: ""
   });
   return response;
 }

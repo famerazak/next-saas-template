@@ -31,7 +31,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S06 - Dashboard shell with real user/tenant context**
   - User sees tenant name and their current role in `/dashboard`.
 
-- [ ] **S07 - Basic profile settings** [app][ui]
+- [x] **S07 - Basic profile settings** [app][ui]
   - User can update profile info in `/settings/profile`.
 
 - [ ] **S08 - Role-aware nav visibility (tenant side)**

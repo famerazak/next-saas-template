@@ -17,6 +17,7 @@ export async function SiteNav() {
                 Signed in as {session.email}
               </span>
               <Link href="/dashboard">Dashboard</Link>
+              <Link href="/settings/profile">Profile</Link>
               <form method="post" action="/api/auth/logout">
                 <button type="submit" className="link-button">
                   Log out
