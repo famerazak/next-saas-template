@@ -27,48 +27,6 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Resolve target tasks
-        id: resolve_targets
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            changed_ids=$(python3 -m harness.scripts.changed_task_ids \
-              --base "${{ github.event.pull_request.base.sha }}" \
-              --head "${{ github.event.pull_request.head.sha }}" \
-              --tasks-file TASKS.md || true)
-          else
-            changed_ids=""
-          fi
-
-          pilot_ids=$(python3 - <<'PY'
-          import json
-          from pathlib import Path
-          policy = json.loads(Path("harness/supervisor_policy.json").read_text(encoding="utf-8"))
-          print(" ".join(policy.get("pilot", {}).get("include_task_ids", [])))
-          PY
-          )
-
-          if [[ -n "$changed_ids" ]]; then
-            filtered_ids=$(python3 - "$changed_ids" "$pilot_ids" <<'PY'
-            import sys
-            changed = set(sys.argv[1].split())
-            pilot = set(sys.argv[2].split())
-            print(" ".join(sorted(changed & pilot)))
-            PY
-            )
-          else
-            filtered_ids=""
-          fi
-
-          if [[ -n "$filtered_ids" ]]; then
-            echo "task_source=ids" >> "$GITHUB_OUTPUT"
-            echo "task_ids=$filtered_ids" >> "$GITHUB_OUTPUT"
-          else
-            echo "task_source=pilot" >> "$GITHUB_OUTPUT"
-            echo "task_ids=" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Prepare artifacts directory
         run: mkdir -p .supervisor-artifacts
 
@@ -77,25 +35,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          task_source="${{ steps.resolve_targets.outputs.task_source }}"
-          task_ids="${{ steps.resolve_targets.outputs.task_ids }}"
-          echo "Resolved task_source=$task_source"
-          echo "Resolved task_ids=$task_ids"
-
-          if [[ "$task_source" == "ids" && -n "${task_ids// }" ]]; then
-            python3 -m harness.supervisor run \
-              --tasks-file TASKS.md \
-              --policy-file harness/supervisor_policy.json \
-              --artifacts-dir .supervisor-artifacts \
-              --task-source ids \
-              --task-ids $task_ids
-          else
-            python3 -m harness.supervisor run \
-              --tasks-file TASKS.md \
-              --policy-file harness/supervisor_policy.json \
-              --artifacts-dir .supervisor-artifacts \
-              --task-source pilot
-          fi
+          python3 -m harness.supervisor run \
+            --tasks-file TASKS.md \
+            --policy-file harness/supervisor_policy.json \
+            --artifacts-dir .supervisor-artifacts \
+            --task-source pilot
 
       - name: Capture summary path
         id: capture_summary
@@ -112,6 +56,7 @@ jobs:
         with:
           name: supervisor-artifacts
           path: .supervisor-artifacts
+          if-no-files-found: warn
 
       - name: Comment PR with supervisor summary
         if: github.event_name == 'pull_request' && always()
