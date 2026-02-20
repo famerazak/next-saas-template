@@ -31,11 +31,12 @@ jobs:
         id: resolve_targets
         shell: bash
         run: |
+          set -euo pipefail
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             changed_ids=$(python3 -m harness.scripts.changed_task_ids \
               --base "${{ github.event.pull_request.base.sha }}" \
               --head "${{ github.event.pull_request.head.sha }}" \
-              --tasks-file TASKS.md)
+              --tasks-file TASKS.md || true)
           else
             changed_ids=""
           fi
@@ -68,17 +69,26 @@ jobs:
             echo "task_ids=" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Prepare artifacts directory
+        run: mkdir -p .supervisor-artifacts
+
       - name: Run Supervisor
         id: run_supervisor
         shell: bash
         run: |
-          if [[ "${{ steps.resolve_targets.outputs.task_source }}" == "ids" ]]; then
+          set -euo pipefail
+          task_source="${{ steps.resolve_targets.outputs.task_source }}"
+          task_ids="${{ steps.resolve_targets.outputs.task_ids }}"
+          echo "Resolved task_source=$task_source"
+          echo "Resolved task_ids=$task_ids"
+
+          if [[ "$task_source" == "ids" && -n "${task_ids// }" ]]; then
             python3 -m harness.supervisor run \
               --tasks-file TASKS.md \
               --policy-file harness/supervisor_policy.json \
               --artifacts-dir .supervisor-artifacts \
               --task-source ids \
-              --task-ids ${{ steps.resolve_targets.outputs.task_ids }}
+              --task-ids $task_ids
           else
             python3 -m harness.supervisor run \
               --tasks-file TASKS.md \
