@@ -2,6 +2,10 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { setAppSession } from "@/lib/auth/session";
 import { getSupabaseEnv } from "@/lib/supabase/config";
+import {
+  deriveTenantContextFromEmail,
+  resolvePrimaryTenantContextForUser
+} from "@/lib/tenant/context";
 
 type LoginRequest = {
   email?: string;
@@ -31,11 +35,24 @@ export async function POST(request: Request) {
   }
 
   if (process.env.E2E_AUTH_BYPASS === "1") {
+    const tenant = deriveTenantContextFromEmail(parsed.email, "Owner");
     const response = NextResponse.json(
-      { userId: `e2e-${parsed.email}`, redirectTo: "/dashboard" },
+      {
+        userId: `e2e-${parsed.email}`,
+        redirectTo: "/dashboard",
+        tenantId: tenant.tenantId,
+        tenantName: tenant.tenantName,
+        role: tenant.role
+      },
       { status: 200 }
     );
-    setAppSession(response, { userId: `e2e-${parsed.email}`, email: parsed.email });
+    setAppSession(response, {
+      userId: `e2e-${parsed.email}`,
+      email: parsed.email,
+      tenantId: tenant.tenantId,
+      tenantName: tenant.tenantName,
+      role: tenant.role
+    });
     return response;
   }
 
@@ -72,13 +89,42 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Login succeeded but user identity is incomplete." }, { status: 500 });
   }
 
+  let tenant;
+  try {
+    tenant = await resolvePrimaryTenantContextForUser({
+      userId: data.user.id,
+      email: data.user.email,
+      supabaseUrl,
+      serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY
+    });
+  } catch (tenantError) {
+    return NextResponse.json(
+      {
+        error:
+          tenantError instanceof Error
+            ? tenantError.message
+            : "Login succeeded, but tenant context could not be resolved."
+      },
+      { status: 500 }
+    );
+  }
+
   const response = NextResponse.json(
     {
       userId: data.user.id,
-      redirectTo: "/dashboard"
+      redirectTo: "/dashboard",
+      tenantId: tenant.tenantId,
+      tenantName: tenant.tenantName,
+      role: tenant.role
     },
     { status: 200 }
   );
-  setAppSession(response, { userId: data.user.id, email: data.user.email });
+  setAppSession(response, {
+    userId: data.user.id,
+    email: data.user.email,
+    tenantId: tenant.tenantId,
+    tenantName: tenant.tenantName,
+    role: tenant.role
+  });
   return response;
 }

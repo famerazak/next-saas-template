@@ -1,35 +1,24 @@
 import { redirect } from "next/navigation";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
 
-type DashboardPageProps = {
-  searchParams?: Promise<Record<string, string | string[] | undefined>>;
-};
-
-function fromQuery(value: string | string[] | undefined): string | null {
-  if (!value) return null;
-  if (Array.isArray(value)) return value[0] ?? null;
-  return value;
-}
-
-export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+export default async function DashboardPage() {
   const session = await getAppSessionFromCookies();
   if (!session) {
     redirect("/login");
   }
 
-  const resolvedSearchParams = (await searchParams) ?? {};
-  const tenantName = fromQuery(resolvedSearchParams.tenantName);
-  const role = fromQuery(resolvedSearchParams.role);
-  const email = fromQuery(resolvedSearchParams.email);
+  const tenantName = session.tenantName ?? "Unknown workspace";
+  const role = session.role ?? "Member";
+  const email = session.email;
 
   return (
     <main className="page-shell">
       <section className="auth-card">
         <h1>Dashboard</h1>
-        <p className="auth-subtitle">Account created. You are now in the app shell.</p>
-        {email ? <p data-testid="dashboard-email">Email: {email}</p> : null}
-        {tenantName ? <p data-testid="tenant-name">Tenant: {tenantName}</p> : null}
-        {role ? <p data-testid="tenant-role">Role: {role}</p> : null}
+        <p className="auth-subtitle">Your tenant context is loaded from your active session.</p>
+        <p data-testid="dashboard-email">Email: {email}</p>
+        <p data-testid="tenant-name">Tenant: {tenantName}</p>
+        <p data-testid="tenant-role">Role: {role}</p>
       </section>
     </main>
   );
