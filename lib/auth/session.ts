@@ -1,11 +1,15 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import type { TenantRole } from "@/lib/tenant/context";
 
 export const APP_SESSION_COOKIE = "app_session";
 
-type AppSession = {
+export type AppSession = {
   userId: string;
   email: string;
+  tenantId?: string;
+  tenantName?: string;
+  role?: TenantRole;
 };
 
 function encodeSession(session: AppSession): string {

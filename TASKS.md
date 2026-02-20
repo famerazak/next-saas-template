@@ -28,7 +28,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S05 - Protected routing baseline**
   - Unauthenticated users are redirected from app routes to `/login`.
 
-- [ ] **S06 - Dashboard shell with real user/tenant context**
+- [x] **S06 - Dashboard shell with real user/tenant context**
   - User sees tenant name and their current role in `/dashboard`.
 
 - [ ] **S07 - Basic profile settings** [app][ui]

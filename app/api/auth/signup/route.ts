@@ -3,36 +3,12 @@ import { NextResponse } from "next/server";
 import { setAppSession } from "@/lib/auth/session";
 import { getSupabaseEnv } from "@/lib/supabase/config";
 import { bootstrapTenantForUser } from "@/lib/tenant/bootstrap";
+import { deriveTenantContextFromEmail } from "@/lib/tenant/context";
 
 type SignupRequest = {
   email?: string;
   password?: string;
 };
-
-function toTitleCase(value: string): string {
-  if (!value) return "Workspace";
-  return value
-    .split(/[\s_-]+/)
-    .filter(Boolean)
-    .map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase())
-    .join(" ");
-}
-
-function deriveTenantName(email: string): string {
-  const [, domain = "workspace.local"] = email.split("@");
-  const root = domain.split(".")[0] ?? "workspace";
-  return `${toTitleCase(root)} Workspace`;
-}
-
-function deriveTenantId(email: string): string {
-  const tenantSlug = email
-    .toLowerCase()
-    .split("@")[1]
-    ?.split(".")[0]
-    ?.replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  return `tenant-${tenantSlug || "workspace"}`;
-}
 
 function validateInput(payload: SignupRequest): { email: string; password: string } | null {
   const email = payload.email?.trim();
@@ -64,21 +40,25 @@ export async function POST(request: Request) {
 
   if (process.env.E2E_AUTH_BYPASS === "1") {
     const userId = `e2e-${parsed.email}`;
-    const tenantName = deriveTenantName(parsed.email);
-    const tenantId = deriveTenantId(parsed.email);
-    const role = "Owner";
+    const tenant = deriveTenantContextFromEmail(parsed.email, "Owner");
     const response = NextResponse.json(
       {
         userId,
         email: parsed.email,
         redirectTo: "/dashboard",
-        tenantId,
-        tenantName,
-        role
+        tenantId: tenant.tenantId,
+        tenantName: tenant.tenantName,
+        role: tenant.role
       },
       { status: 201 }
     );
-    setAppSession(response, { userId, email: parsed.email });
+    setAppSession(response, {
+      userId,
+      email: parsed.email,
+      tenantId: tenant.tenantId,
+      tenantName: tenant.tenantName,
+      role: tenant.role
+    });
     return response;
   }
 
@@ -160,6 +140,12 @@ export async function POST(request: Request) {
     },
     { status: 201 }
   );
-  setAppSession(response, { userId: data.user.id, email: data.user.email });
+  setAppSession(response, {
+    userId: data.user.id,
+    email: data.user.email,
+    tenantId: bootstrap.tenantId,
+    tenantName: bootstrap.tenantName,
+    role: bootstrap.role
+  });
   return response;
 }
