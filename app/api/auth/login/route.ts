@@ -5,6 +5,7 @@ import { loadProfileForUser } from "@/lib/profile/store";
 import { getSupabaseEnv } from "@/lib/supabase/config";
 import {
   deriveTenantContextFromEmail,
+  inferTenantRoleFromEmail,
   resolvePrimaryTenantContextForUser
 } from "@/lib/tenant/context";
 
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
   }
 
   if (process.env.E2E_AUTH_BYPASS === "1") {
-    const tenant = deriveTenantContextFromEmail(parsed.email, "Owner");
+    const tenant = deriveTenantContextFromEmail(parsed.email, inferTenantRoleFromEmail(parsed.email));
     const response = NextResponse.json(
       {
         userId: `e2e-${parsed.email}`,

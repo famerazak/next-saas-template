@@ -3,6 +3,8 @@ import { getAppSessionFromCookies } from "@/lib/auth/session";
 
 export async function SiteNav() {
   const session = await getAppSessionFromCookies();
+  const role = session?.role ?? "Member";
+  const canManageTenant = role === "Owner" || role === "Admin";
 
   return (
     <header className="site-header">
@@ -18,6 +20,19 @@ export async function SiteNav() {
               </span>
               <Link href="/dashboard">Dashboard</Link>
               <Link href="/settings/profile">Profile</Link>
+              {canManageTenant ? (
+                <>
+                  <Link href="/team" data-testid="nav-link-team">
+                    Team
+                  </Link>
+                  <Link href="/billing" data-testid="nav-link-billing">
+                    Billing
+                  </Link>
+                  <Link href="/audit-logs" data-testid="nav-link-audit-logs">
+                    Audit Logs
+                  </Link>
+                </>
+              ) : null}
               <form method="post" action="/api/auth/logout">
                 <button type="submit" className="link-button">
                   Log out
