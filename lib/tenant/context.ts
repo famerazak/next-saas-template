@@ -56,6 +56,14 @@ function deriveTenantId(email: string): string {
   return `tenant-${tenantSlug || "workspace"}`;
 }
 
+export function inferTenantRoleFromEmail(email: string): TenantRole {
+  const local = (email.split("@")[0] || "").toLowerCase();
+  if (local.includes("admin")) return "Admin";
+  if (local.includes("member")) return "Member";
+  if (local.includes("viewer")) return "Viewer";
+  return "Owner";
+}
+
 export function deriveTenantContextFromEmail(email: string, role: TenantRole): TenantContext {
   const [, domain = "workspace.local"] = email.split("@");
   const root = domain.split(".")[0] ?? "workspace";
