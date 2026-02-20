@@ -94,6 +94,16 @@ a {
   font-size: 0.87rem;
 }
 
+.auth-success {
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.87rem;
+}
+
 .auth-links {
   margin-top: 1rem;
   display: flex;
