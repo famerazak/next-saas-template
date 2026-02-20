@@ -4,25 +4,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
-type SignupState = {
+type LoginState = {
   loading: boolean;
   error: string;
 };
 
-export function SignupForm() {
+export function LoginForm() {
   const router = useRouter();
-  const [state, setState] = useState<SignupState>({ loading: false, error: "" });
+  const [state, setState] = useState<LoginState>({ loading: false, error: "" });
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const formData = new FormData(form);
+    const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") ?? "").trim();
     const password = String(formData.get("password") ?? "");
 
     setState({ loading: true, error: "" });
 
-    const response = await fetch("/api/auth/signup", {
+    const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
@@ -31,40 +30,28 @@ export function SignupForm() {
     const payload = (await response.json().catch(() => ({}))) as {
       error?: string;
       redirectTo?: string;
-      tenantId?: string;
-      tenantName?: string;
-      role?: string;
-      email?: string;
     };
 
     if (!response.ok) {
       setState({
         loading: false,
-        error: payload.error ?? "Unable to create account. Please try again."
+        error: payload.error ?? "Unable to log in. Please try again."
       });
       return;
     }
 
-    const redirectTo = payload.redirectTo ?? "/dashboard";
-    const params = new URLSearchParams();
-    if (payload.tenantId) params.set("tenantId", payload.tenantId);
-    if (payload.tenantName) params.set("tenantName", payload.tenantName);
-    if (payload.role) params.set("role", payload.role);
-    if (payload.email) params.set("email", payload.email);
-    if (!payload.email && email) params.set("email", email);
-    const suffix = params.toString();
-    router.push(suffix ? `${redirectTo}?${suffix}` : redirectTo);
+    router.push(payload.redirectTo ?? "/dashboard");
     router.refresh();
   }
 
   return (
     <main className="page-shell">
       <section className="auth-card">
-        <h1>Create account</h1>
-        <p className="auth-subtitle">Start your team workspace.</p>
+        <h1>Log in</h1>
+        <p className="auth-subtitle">Welcome back. Access your workspace.</p>
         <form className="auth-form" data-testid="auth-form" onSubmit={handleSubmit}>
           <label htmlFor="email">
-            Work email
+            Email
             <input
               id="email"
               name="email"
@@ -80,23 +67,22 @@ export function SignupForm() {
               id="password"
               name="password"
               type="password"
-              autoComplete="new-password"
-              placeholder="Create a password"
-              minLength={8}
+              autoComplete="current-password"
+              placeholder="••••••••"
               required
             />
           </label>
           {state.error ? (
-            <p role="alert" className="auth-error" data-testid="signup-error">
+            <p role="alert" className="auth-error" data-testid="login-error">
               {state.error}
             </p>
           ) : null}
           <button type="submit" disabled={state.loading}>
-            {state.loading ? "Creating account..." : "Create account"}
+            {state.loading ? "Logging in..." : "Log in"}
           </button>
         </form>
         <nav className="auth-links" aria-label="Auth shortcuts">
-          <Link href="/login">Already have an account?</Link>
+          <Link href="/signup">Create account</Link>
           <Link href="/forgot-password">Forgot password?</Link>
         </nav>
       </section>

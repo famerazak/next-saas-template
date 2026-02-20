@@ -12,12 +12,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const resolvedSearchParams = (await searchParams) ?? {};
   const tenantName = fromQuery(resolvedSearchParams.tenantName);
   const role = fromQuery(resolvedSearchParams.role);
+  const email = fromQuery(resolvedSearchParams.email);
 
   return (
     <main className="page-shell">
       <section className="auth-card">
         <h1>Dashboard</h1>
         <p className="auth-subtitle">Account created. You are now in the app shell.</p>
+        {email ? <p data-testid="dashboard-email">Email: {email}</p> : null}
         {tenantName ? <p data-testid="tenant-name">Tenant: {tenantName}</p> : null}
         {role ? <p data-testid="tenant-role">Role: {role}</p> : null}
       </section>

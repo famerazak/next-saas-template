@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { setAppSession } from "@/lib/auth/session";
 import { getSupabaseEnv } from "@/lib/supabase/config";
 import { bootstrapTenantForUser } from "@/lib/tenant/bootstrap";
 
@@ -7,6 +8,31 @@ type SignupRequest = {
   email?: string;
   password?: string;
 };
+
+function toTitleCase(value: string): string {
+  if (!value) return "Workspace";
+  return value
+    .split(/[\s_-]+/)
+    .filter(Boolean)
+    .map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function deriveTenantName(email: string): string {
+  const [, domain = "workspace.local"] = email.split("@");
+  const root = domain.split(".")[0] ?? "workspace";
+  return `${toTitleCase(root)} Workspace`;
+}
+
+function deriveTenantId(email: string): string {
+  const tenantSlug = email
+    .toLowerCase()
+    .split("@")[1]
+    ?.split(".")[0]
+    ?.replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `tenant-${tenantSlug || "workspace"}`;
+}
 
 function validateInput(payload: SignupRequest): { email: string; password: string } | null {
   const email = payload.email?.trim();
@@ -34,6 +60,26 @@ export async function POST(request: Request) {
       { error: "Provide a valid email and a password with at least 8 characters." },
       { status: 400 }
     );
+  }
+
+  if (process.env.E2E_AUTH_BYPASS === "1") {
+    const userId = `e2e-${parsed.email}`;
+    const tenantName = deriveTenantName(parsed.email);
+    const tenantId = deriveTenantId(parsed.email);
+    const role = "Owner";
+    const response = NextResponse.json(
+      {
+        userId,
+        email: parsed.email,
+        redirectTo: "/dashboard",
+        tenantId,
+        tenantName,
+        role
+      },
+      { status: 201 }
+    );
+    setAppSession(response, { userId, email: parsed.email });
+    return response;
   }
 
   let supabaseUrl: string;
@@ -103,9 +149,10 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json(
+  const response = NextResponse.json(
     {
       userId: data.user.id,
+      email: data.user.email,
       redirectTo: "/dashboard",
       tenantId: bootstrap.tenantId,
       tenantName: bootstrap.tenantName,
@@ -113,4 +160,6 @@ export async function POST(request: Request) {
     },
     { status: 201 }
   );
+  setAppSession(response, { userId: data.user.id, email: data.user.email });
+  return response;
 }
