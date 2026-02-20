@@ -1,3 +1,6 @@
+import { redirect } from "next/navigation";
+import { getAppSessionFromCookies } from "@/lib/auth/session";
+
 type DashboardPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
@@ -9,6 +12,11 @@ function fromQuery(value: string | string[] | undefined): string | null {
 }
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const session = await getAppSessionFromCookies();
+  if (!session) {
+    redirect("/login");
+  }
+
   const resolvedSearchParams = (await searchParams) ?? {};
   const tenantName = fromQuery(resolvedSearchParams.tenantName);
   const role = fromQuery(resolvedSearchParams.role);
