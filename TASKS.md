@@ -16,7 +16,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S01 - Public auth pages render** [ui][app]
   - User can open `/login`, `/signup`, `/forgot-password` with basic UI.
 
-- [ ] **S02 - User can create account** [auth][app]
+- [x] **S02 - User can create account** [auth][app]
   - Signup creates Supabase Auth user and lands user in app.
 
 - [ ] **S03 - First tenant is created on signup**
