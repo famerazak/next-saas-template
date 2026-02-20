@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { getSupabaseEnv } from "@/lib/supabase/config";
+import { bootstrapTenantForUser } from "@/lib/tenant/bootstrap";
 
 type SignupRequest = {
   email?: string;
@@ -37,6 +38,7 @@ export async function POST(request: Request) {
 
   let supabaseUrl: string;
   let supabaseAnonKey: string;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   try {
     const env = getSupabaseEnv();
     supabaseUrl = env.url;
@@ -64,10 +66,50 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
+  if (!data.user?.id || !data.user.email) {
+    return NextResponse.json(
+      { error: "Signup succeeded but user identity is incomplete." },
+      { status: 500 }
+    );
+  }
+
+  if (!serviceRoleKey) {
+    return NextResponse.json(
+      {
+        error:
+          "Account created, but tenant bootstrap is not configured. Set SUPABASE_SERVICE_ROLE_KEY."
+      },
+      { status: 500 }
+    );
+  }
+
+  let bootstrap;
+  try {
+    bootstrap = await bootstrapTenantForUser({
+      userId: data.user.id,
+      email: data.user.email,
+      supabaseUrl,
+      serviceRoleKey
+    });
+  } catch (bootstrapError) {
+    return NextResponse.json(
+      {
+        error:
+          bootstrapError instanceof Error
+            ? bootstrapError.message
+            : "Account created, but tenant bootstrap failed."
+      },
+      { status: 500 }
+    );
+  }
+
   return NextResponse.json(
     {
-      userId: data.user?.id ?? null,
-      redirectTo: "/dashboard"
+      userId: data.user.id,
+      redirectTo: "/dashboard",
+      tenantId: bootstrap.tenantId,
+      tenantName: bootstrap.tenantName,
+      role: bootstrap.role
     },
     { status: 201 }
   );

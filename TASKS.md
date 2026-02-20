@@ -19,7 +19,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S02 - User can create account** [auth][app]
   - Signup creates Supabase Auth user and lands user in app.
 
-- [ ] **S03 - First tenant is created on signup**
+- [x] **S03 - First tenant is created on signup**
   - New user gets a tenant + `Owner` membership automatically.
 
 - [ ] **S04 - User can log in and log out**
