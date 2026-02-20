@@ -13,7 +13,7 @@ Each slice should ship something real a user can see/use.
 
 ## Slice 01-10: Account + Tenant Foundations
 
-- [ ] **S01 - Public auth pages render** [ui][app]
+- [x] **S01 - Public auth pages render** [ui][app]
   - User can open `/login`, `/signup`, `/forgot-password` with basic UI.
 
 - [ ] **S02 - User can create account** [auth][app]
