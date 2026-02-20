@@ -4,6 +4,10 @@
 
 Operational harness for task execution quality control against `TASKS.md`.
 
+Process reference:
+
+- `docs/harness/PR_PROCESS.md` (authoritative slice PR workflow + video evidence rule)
+
 ## Core Behavior
 
 1. Parse tasks from `TASKS.md`.
@@ -43,12 +47,9 @@ Workflow: `.github/workflows/supervisor-run.yml`
 
 On pull requests, the workflow:
 
-1. Diffs `TASKS.md` between base/head and extracts changed task IDs.
-2. If changed IDs intersect pilot include-list, runs only those IDs.
-3. Otherwise runs full pilot include-list.
-4. Executes supervisor with blocking/advisory enforcement.
-5. Uploads artifacts.
-6. Posts/updates PR summary comment.
+1. Executes supervisor with blocking/advisory enforcement.
+2. Uploads artifacts.
+3. Posts/updates PR summary comment.
 
 ## Branch Protection Setup (manual)
 
