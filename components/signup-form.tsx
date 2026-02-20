@@ -31,6 +31,9 @@ export function SignupForm() {
     const payload = (await response.json().catch(() => ({}))) as {
       error?: string;
       redirectTo?: string;
+      tenantId?: string;
+      tenantName?: string;
+      role?: string;
     };
 
     if (!response.ok) {
@@ -41,7 +44,13 @@ export function SignupForm() {
       return;
     }
 
-    router.push(payload.redirectTo ?? "/dashboard");
+    const redirectTo = payload.redirectTo ?? "/dashboard";
+    const params = new URLSearchParams();
+    if (payload.tenantId) params.set("tenantId", payload.tenantId);
+    if (payload.tenantName) params.set("tenantName", payload.tenantName);
+    if (payload.role) params.set("role", payload.role);
+    const suffix = params.toString();
+    router.push(suffix ? `${redirectTo}?${suffix}` : redirectTo);
   }
 
   return (
