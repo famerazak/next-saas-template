@@ -37,7 +37,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S08 - Role-aware nav visibility (tenant side)**
   - Billing/audit/team links appear only for allowed tenant roles.
 
-- [ ] **S09 - Unauthorized route handling UX**
+- [x] **S09 - Unauthorized route handling UX**
   - Disallowed users get clear “no access” UX (not broken page).
 
 - [ ] **S10 - Tenant settings page (owner/admin only)**
