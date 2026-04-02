@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { NoAccessCard } from "@/components/no-access-card";
 import { TeamInviteForm } from "@/components/team-invite-form";
+import { TeamMembersTable } from "@/components/team-members-table";
 import { canAccessTenantAdminArea } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
 import { loadPendingInvitesForSession } from "@/lib/team/invites";
@@ -35,26 +36,11 @@ export default async function TeamPage() {
           </div>
           <div>
             <span className="settings-label">Members</span>
-            <strong data-testid="team-member-count">{members.length}</strong>
+            <strong>{members.length}</strong>
           </div>
         </div>
         <TeamInviteForm tenantName={tenantName} initialPendingInvites={pendingInvites} />
-        <div className="team-table" data-testid="team-member-list">
-          <div className="team-table-header">
-            <span>Name</span>
-            <span>Email</span>
-            <span>Role</span>
-            <span>Status</span>
-          </div>
-          {members.map((member) => (
-            <div className="team-table-row" key={member.id} data-testid={`team-member-${member.id}`}>
-              <span>{member.fullName || "Unknown"}</span>
-              <span>{member.email}</span>
-              <span>{member.role}</span>
-              <span>{member.status}</span>
-            </div>
-          ))}
-        </div>
+        <TeamMembersTable initialMembers={members} currentUserId={session.userId} />
       </section>
     </main>
   );

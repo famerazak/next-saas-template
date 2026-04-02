@@ -393,3 +393,57 @@ a {
   background: #ffffff;
   padding: 1rem;
 }
+
+.team-members-card {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.team-members-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.team-table-header-members,
+.team-table-row-members {
+  grid-template-columns: 1.2fr 1.6fr 1fr 0.8fr 1fr;
+}
+
+.team-table-row-members select {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.9rem;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.team-role-button {
+  border: 0;
+  border-radius: 10px;
+  background: #0ea5e9;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.55rem 0.8rem;
+  cursor: pointer;
+}
+
+.team-role-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.team-role-readonly {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .team-table-header-members,
+  .team-table-row-members {
+    grid-template-columns: 1fr;
+  }
+}
