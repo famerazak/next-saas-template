@@ -8,23 +8,26 @@ async function login(page: Page, email: string) {
   await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
 }
 
-test("S08: owner sees tenant admin nav links", async ({ page }) => {
+test("S08: owner sees tenant admin sidebar links", async ({ page }) => {
   await login(page, "owner@example.com");
-  await expect(page.getByTestId("nav-link-team")).toBeVisible();
-  await expect(page.getByTestId("nav-link-billing")).toBeVisible();
-  await expect(page.getByTestId("nav-link-audit-logs")).toBeVisible();
+  await expect(page.getByTestId("sidebar-link-team")).toBeVisible();
+  await expect(page.getByTestId("sidebar-link-billing")).toBeVisible();
+  await expect(page.getByTestId("sidebar-link-audit-logs")).toBeVisible();
+  await expect(page.locator("header").getByRole("link", { name: "Team" })).toHaveCount(0);
 });
 
-test("S08: admin sees tenant admin nav links", async ({ page }) => {
+test("S08: admin sees tenant admin sidebar links", async ({ page }) => {
   await login(page, "admin@example.com");
-  await expect(page.getByTestId("nav-link-team")).toBeVisible();
-  await expect(page.getByTestId("nav-link-billing")).toBeVisible();
-  await expect(page.getByTestId("nav-link-audit-logs")).toBeVisible();
+  await expect(page.getByTestId("sidebar-link-team")).toBeVisible();
+  await expect(page.getByTestId("sidebar-link-billing")).toBeVisible();
+  await expect(page.getByTestId("sidebar-link-audit-logs")).toBeVisible();
 });
 
-test("S08: member does not see tenant admin nav links", async ({ page }) => {
+test("S08: member only sees dashboard in the sidebar", async ({ page }) => {
   await login(page, "member@example.com");
-  await expect(page.getByTestId("nav-link-team")).toHaveCount(0);
-  await expect(page.getByTestId("nav-link-billing")).toHaveCount(0);
-  await expect(page.getByTestId("nav-link-audit-logs")).toHaveCount(0);
+  await expect(page.getByTestId("sidebar-link-dashboard")).toBeVisible();
+  await expect(page.getByTestId("sidebar-link-team")).toHaveCount(0);
+  await expect(page.getByTestId("sidebar-link-billing")).toHaveCount(0);
+  await expect(page.getByTestId("sidebar-link-audit-logs")).toHaveCount(0);
+  await expect(page.getByTestId("header-profile-avatar")).toBeVisible();
 });

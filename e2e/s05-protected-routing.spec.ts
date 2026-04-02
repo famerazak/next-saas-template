@@ -5,6 +5,7 @@ test("S05: unauthenticated user is redirected from dashboard to login", async ({
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole("heading", { name: "Log in" })).toBeVisible();
   await expect(page.getByTestId("nav-auth-state")).toHaveText("Signed out");
+  await expect(page.getByTestId("app-sidebar")).toHaveCount(0);
 });
 
 test("S05: authenticated user can access dashboard", async ({ page }) => {
@@ -16,4 +17,6 @@ test("S05: authenticated user can access dashboard", async ({ page }) => {
   await expect(page).toHaveURL(/\/dashboard(?:\?.*)?$/);
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
   await expect(page.getByTestId("nav-auth-state")).toContainText("owner@example.com");
+  await expect(page.getByTestId("app-sidebar")).toBeVisible();
+  await expect(page.getByTestId("sidebar-link-dashboard")).toHaveAttribute("aria-current", "page");
 });

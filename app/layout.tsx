@@ -1,7 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { SiteNav } from "@/components/site-nav";
 
 export const metadata: Metadata = {
   title: "Next SaaS Template",
@@ -15,10 +14,7 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body>
-        <SiteNav />
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

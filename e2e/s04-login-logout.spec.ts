@@ -11,10 +11,14 @@ test("S04: login and logout updates session lifecycle and nav state", async ({ p
 
   await expect(page).toHaveURL(/\/dashboard(?:\?.*)?$/, { timeout: 15_000 });
   await expect(page.getByTestId("nav-auth-state")).toContainText("owner@example.com");
+  await expect(page.getByTestId("app-sidebar")).toBeVisible();
+  await expect(page.getByTestId("header-profile-avatar")).toBeVisible();
+  await expect(page.locator("header").getByRole("link", { name: "Dashboard" })).toHaveCount(0);
 
   await page.getByRole("button", { name: "Log out" }).click();
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByTestId("nav-auth-state")).toHaveText("Signed out");
+  await expect(page.getByTestId("app-sidebar")).toHaveCount(0);
 });
 
 test("S04: login error message is shown on failed authentication", async ({ page }) => {
