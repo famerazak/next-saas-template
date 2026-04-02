@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import { NoAccessCard } from "@/components/no-access-card";
+import { TeamInviteForm } from "@/components/team-invite-form";
 import { canAccessTenantAdminArea } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
+import { loadPendingInvitesForSession } from "@/lib/team/invites";
 import { loadTeamMembersForSession } from "@/lib/team/store";
 
 export default async function TeamPage() {
@@ -14,6 +16,8 @@ export default async function TeamPage() {
   }
 
   const members = await loadTeamMembersForSession(session);
+  const pendingInvites = await loadPendingInvitesForSession(session);
+  const tenantName = session.tenantName ?? "Workspace";
 
   return (
     <main className="page-shell">
@@ -27,13 +31,14 @@ export default async function TeamPage() {
         <div className="settings-summary">
           <div>
             <span className="settings-label">Tenant</span>
-            <strong data-testid="team-tenant-name">{session.tenantName ?? "Workspace"}</strong>
+            <strong data-testid="team-tenant-name">{tenantName}</strong>
           </div>
           <div>
             <span className="settings-label">Members</span>
             <strong data-testid="team-member-count">{members.length}</strong>
           </div>
         </div>
+        <TeamInviteForm tenantName={tenantName} initialPendingInvites={pendingInvites} />
         <div className="team-table" data-testid="team-member-list">
           <div className="team-table-header">
             <span>Name</span>
