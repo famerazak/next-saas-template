@@ -6,7 +6,7 @@ Each slice should ship something real a user can see/use.
 ## How to Use
 
 - Mark `[x]` when done.
-- Keep slices small; avoid combining multiple slices into one PR.
+- Keep slices reviewable; combine adjacent low-risk items when they ship one usable capability.
 - If a slice grows too large, split it before coding.
 
 ---
@@ -53,122 +53,83 @@ Each slice should ship something real a user can see/use.
 - [x] **S12 - Invite member flow**
   - Owner/Admin can send invite; invite appears as pending in UI.
 
-- [ ] **S13 - Accept invite flow**
-  - Invited user can join tenant and appears in member list.
+- [x] **S13 - Accept invite flow + membership refresh** [auth][app]
+  - Invited user can join tenant and member list updates without manual relogin.
 
-- [ ] **S14 - Change member role** [rbac][auth]
-  - Owner/Admin can update role between Admin/Member/Viewer.
+- [ ] **S14 - Change member role + team action blocking** [rbac][auth]
+  - Owner/Admin can update role between Admin/Member/Viewer, and Member/Viewer cannot see or use team management controls.
 
 - [ ] **S15 - Remove/deactivate member**
-  - Owner/Admin can remove member from tenant.
+  - Owner/Admin can remove member from tenant and the team list reflects the change immediately.
 
-- [ ] **S16 - Ownership transfer**
+- [ ] **S16 - Ownership transfer** [rbac][auth]
   - Owner can transfer ownership to another eligible member.
 
-- [ ] **S17 - Roles & permissions matrix page**
+- [ ] **S17 - Roles & permissions matrix page** [rbac][ui]
   - `/roles-permissions` shows read-only matrix for Owner/Admin.
 
-- [ ] **S18 - Core app read/write gating**
+- [ ] **S18 - Core app read/write gating** [rbac][app]
   - `Viewer` is read-only in `/app/*`; other roles follow matrix.
-
-- [ ] **S19 - Team actions are blocked for non-admin roles**
-  - Member/Viewer cannot see or use team management controls.
-
-- [ ] **S20 - Membership changes reflected immediately**
-  - Role/member updates refresh UI without requiring manual relogin.
 
 ---
 
 ## Slice 21-28: Security + 2FA + Session Management
 
-- [ ] **S21 - Security page shell**
-  - `/security` exists with 2FA/session sections.
+- [ ] **S21 - Security page shell + tenant policy placeholder + personal events** [security][ui]
+  - `/security` exists with 2FA/session sections, tenant policy placeholder, and personal security event history.
 
 - [ ] **S22 - User can enroll in 2FA** [security][auth]
   - User can start setup, scan TOTP QR, and complete enrollment.
 
-- [ ] **S23 - User can complete 2FA challenge on login**
+- [ ] **S23 - User can complete 2FA challenge on login** [security][auth]
   - If enrolled, login requires 2FA challenge step.
 
-- [ ] **S24 - Backup codes flow**
+- [ ] **S24 - Backup codes flow** [security]
   - User can view/generate backup codes in security screen.
 
-- [ ] **S25 - Session list + revoke**
+- [ ] **S25 - Session list + revoke** [security]
   - User can view active sessions and revoke selected sessions.
 
-- [ ] **S26 - Optional 2FA policy UX placeholder**
-  - Owner/Admin see tenant-level policy area marked “not enforced in v1”.
-
-- [ ] **S27 - Security events visible to user**
-  - User can view personal security events in `/security`.
-
-- [ ] **S28 - Auth abuse UX**
+- [ ] **S28 - Auth abuse UX** [security][auth]
   - Rate-limit/captcha failures show clear user-facing error messages.
 
 ---
 
 ## Slice 29-37: Billing + Stripe + Reliability
 
-- [ ] **S29 - Billing page visible to Owner only**
-  - Owner can access `/billing`; others cannot.
-
-- [ ] **S30 - Stripe checkout/session start**
-  - Owner can start plan/seat payment flow from billing UI.
+- [ ] **S29 - Owner billing access + checkout start** [billing]
+  - Owner can access `/billing`, others cannot, and owner can start plan/seat checkout from the billing UI.
 
 - [ ] **S31 - Add/update card details** [billing]
   - Owner can add or update payment method via Stripe flow.
 
-- [ ] **S32 - Billing status card on dashboard**
-  - Tenant sees plan/seat summary reflected in dashboard cards.
+- [ ] **S32 - Billing summary + invoices list** [billing][app]
+  - Tenant sees plan/seat summary on the dashboard and the owner can view recent invoices in billing.
 
-- [ ] **S33 - Invoices list shown**
-  - Owner can see recent invoices in billing page.
+- [ ] **S35 - Webhook ingestion + idempotent behavior** [webhook][billing]
+  - Stripe webhook events are accepted, reflected in app state, and duplicate events do not create duplicate state changes.
 
-- [ ] **S34 - Webhook ingestion endpoint works**
-  - Stripe webhook events are accepted and reflected in app state.
-
-- [ ] **S35 - Idempotent webhook behavior** [webhook][billing]
-  - Duplicate Stripe events do not create duplicate state changes.
-
-- [ ] **S36 - Failed webhook retry UX in platform**
-  - Platform admin can trigger retry from `/platform/webhooks-jobs`.
-
-- [ ] **S37 - Dead-letter visibility**
-  - Permanently failed events are visible with basic diagnostics.
+- [ ] **S36 - Failed webhook retry + dead-letter visibility** [platform][webhook][billing]
+  - Platform admin can retry failed events from `/platform/webhooks-jobs` and inspect dead-letter diagnostics.
 
 ---
 
 ## Slice 38-47: Tenant Audit Logs + Exports
 
-- [ ] **S38 - Tenant audit event model wired**
+- [ ] **S38 - Tenant audit event model wired** [app]
   - Key privileged actions produce audit entries.
 
-- [ ] **S39 - Tenant audit logs page UI**
-  - Owner/Admin can open `/audit-logs` and view events.
+- [ ] **S39 - Tenant audit logs page + filters/search + non-admin denial** [ui][app]
+  - Owner/Admin can open `/audit-logs`, filter/search events, and Member/Viewer are denied access and export actions.
 
-- [ ] **S40 - Audit filters**
-  - Owner/Admin can filter by actor/action/date.
+- [ ] **S42 - Audit exports (CSV + JSON) with tenant boundary safety** [app]
+  - Owner/Admin can export tenant audit logs to CSV and JSON, and exports contain only current-tenant events.
 
-- [ ] **S41 - Audit search**
-  - Owner/Admin can search audit rows in UI.
-
-- [ ] **S42 - CSV export**
-  - Owner/Admin can export tenant audit logs to CSV.
-
-- [ ] **S43 - JSON export**
-  - Owner/Admin can export tenant audit logs to JSON.
-
-- [ ] **S44 - Non-admin audit access denied**
-  - Member/Viewer cannot access or export audit logs.
-
-- [ ] **S45 - Platform-initiated tenant changes appear in tenant logs**
+- [ ] **S45 - Platform-initiated tenant changes appear in tenant logs** [platform][security]
   - Tenant admins can see operator actions with reason metadata.
 
-- [ ] **S46 - Audit action details panel**
+- [ ] **S46 - Audit action details panel** [ui][app]
   - User can open an event and see full action metadata.
-
-- [ ] **S47 - Export respects tenant boundary**
-  - Export contains only current tenant events.
 
 ---
 
@@ -177,80 +138,56 @@ Each slice should ship something real a user can see/use.
 - [ ] **S48 - Platform routes + nav visibility** [platform][security]
   - `/platform/*` routes render only for `PlatformAdmin`.
 
-- [ ] **S49 - Platform dashboard basic KPIs**
-  - Admin sees tenant/job/webhook KPI cards.
-
-- [ ] **S50 - Platform tenants list**
-  - Search/filter tenants in `/platform/tenants`.
-
-- [ ] **S51 - Platform tenant detail page**
-  - View tenant summary, members, billing snapshot.
+- [ ] **S49 - Platform dashboard + tenants list/detail** [platform][ui]
+  - Admin sees KPI cards, can search/filter tenants, and can open tenant detail with members and billing snapshot.
 
 - [ ] **S52 - Platform can edit tenant member roles** [platform][rbac]
-  - Direct write actions work from tenant detail.
+  - Direct role-edit actions work from tenant detail and require a reason before privileged writes complete.
 
-- [ ] **S53 - Platform users page**
+- [ ] **S53 - Platform users page** [platform]
   - Search global users and inspect memberships.
 
-- [ ] **S54 - Platform billing ops page**
-  - Admin can perform manual billing adjustments with reason.
+- [ ] **S54 - Platform billing/support ops with required reason** [platform][billing]
+  - Admin can perform manual billing adjustments and support actions with required reason/ticket context.
 
-- [ ] **S55 - Platform support page**
-  - Admin can open support actions and log ticket reference.
+- [ ] **S56 - Platform compliance explorer + webhook/job operations** [platform][security][webhook]
+  - Admin can view global audit/security events and inspect/retry failed jobs or webhooks.
 
-- [ ] **S56 - Platform security/compliance explorer**
-  - Admin can view global audit/security event feed.
-
-- [ ] **S57 - Platform webhooks/jobs operations**
-  - Admin can inspect and retry failed jobs/events.
-
-- [ ] **S58 - Platform feature flags page**
-  - Admin can view/update global and tenant-scoped flags.
-
-- [ ] **S59 - Platform system settings page**
-  - Admin can edit policy defaults and retention settings.
-
-- [ ] **S60 - All platform write actions require reason**
-  - UI enforces reason field before privileged platform writes.
+- [ ] **S58 - Platform feature flags + system settings** [platform]
+  - Admin can view/update global and tenant-scoped flags and edit policy/retention defaults.
 
 ---
 
 ## Slice 61-72: Storage, Analytics, Legal, and Hardening UX
 
-- [ ] **S61 - File upload page in core app**
-  - User can upload a file and see it in list.
+- [ ] **S61 - File upload + tenant-scoped visibility** [storage][app]
+  - User can upload a file, see it in a list, and only view files in the current tenant context.
 
-- [ ] **S62 - Tenant-scoped file visibility**
-  - Users only see files in their tenant context.
-
-- [ ] **S63 - Signed download flow**
+- [ ] **S63 - Signed download flow** [storage]
   - User can download file via signed URL.
 
-- [ ] **S64 - Delete file flow**
+- [ ] **S64 - Delete file flow** [storage]
   - Authorized user can delete file and it disappears from UI.
 
-- [ ] **S65 - Cookie consent banner**
+- [ ] **S65 - Cookie consent banner** [analytics][ui]
   - User can accept/reject analytics cookies in visible banner.
 
 - [ ] **S66 - GA gated by consent state** [analytics]
   - Analytics activates only when consent allows.
 
-- [ ] **S67 - Legal pages published**
+- [ ] **S67 - Legal pages published** [app]
   - `/privacy`, `/terms`, and placeholder compliance pages accessible.
 
-- [ ] **S68 - Error tracking visible in platform diagnostics**
-  - New app errors appear in platform diagnostic surface.
+- [ ] **S68 - Error tracking + security header diagnostics surface** [platform][security]
+  - New app errors appear in platform diagnostics and operators can verify header/CSP status from an in-app diagnostic surface.
 
-- [ ] **S69 - Security headers/CSP validation page check**
-  - Basic in-app status/check route shows header policy is active.
-
-- [ ] **S70 - Auth + critical endpoint rate-limit UX**
+- [ ] **S70 - Auth + critical endpoint rate-limit UX** [security][auth]
   - End users get usable response when hitting rate limits.
 
-- [ ] **S71 - Environment/config validation failure UX**
+- [ ] **S71 - Environment/config validation failure UX** [security][infra]
   - Startup/config issues surface clearly for operators.
 
-- [ ] **S72 - “Starter ready” smoke flow**
+- [ ] **S72 - “Starter ready” smoke flow** [app][ui]
   - End-to-end happy path demo works:
     - create account
     - create tenant

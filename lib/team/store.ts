@@ -15,6 +15,24 @@ type MembershipRow = {
   role: string;
 };
 
+type LocalTeamMember = TeamMember & {
+  tenantId: string;
+};
+
+type LocalTeamStore = Map<string, TeamMember[]>;
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __localTeamStore: LocalTeamStore | undefined;
+}
+
+function getLocalTeamStore(): LocalTeamStore {
+  if (!globalThis.__localTeamStore) {
+    globalThis.__localTeamStore = new Map<string, TeamMember[]>();
+  }
+  return globalThis.__localTeamStore;
+}
+
 function getServiceClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -54,10 +72,42 @@ function fallbackMemberFromSession(session: AppSession): TeamMember[] {
   ];
 }
 
+export function saveLocalTeamMember(member: LocalTeamMember): TeamMember[] {
+  const store = getLocalTeamStore();
+  const existing = store.get(member.tenantId) ?? [];
+  const next = [
+    {
+      id: member.id,
+      email: member.email,
+      fullName: member.fullName,
+      role: member.role,
+      status: member.status
+    },
+    ...existing.filter((entry) => entry.id !== member.id)
+  ];
+  store.set(member.tenantId, next);
+  return next;
+}
+
+function loadFromLocalStore(session: AppSession): TeamMember[] {
+  if (!session.tenantId) {
+    return fallbackMemberFromSession(session);
+  }
+
+  return saveLocalTeamMember({
+    tenantId: session.tenantId,
+    id: session.userId,
+    email: session.email,
+    fullName: session.fullName || "Current user",
+    role: session.role ?? "Member",
+    status: "Active"
+  });
+}
+
 export async function loadTeamMembersForSession(session: AppSession): Promise<TeamMember[]> {
   const supabase = getServiceClient();
   if (!supabase || !session.tenantId) {
-    return fallbackMemberFromSession(session);
+    return loadFromLocalStore(session);
   }
 
   const { data: memberships, error } = await supabase
@@ -68,7 +118,7 @@ export async function loadTeamMembersForSession(session: AppSession): Promise<Te
     .returns<MembershipRow[]>();
 
   if (error || !memberships || memberships.length === 0) {
-    return fallbackMemberFromSession(session);
+    return loadFromLocalStore(session);
   }
 
   const users = await Promise.all(
