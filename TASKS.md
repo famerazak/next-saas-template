@@ -47,7 +47,7 @@ Each slice should ship something real a user can see/use.
 
 ## Slice 11-20: Team Management + Permissions UX
 
-- [ ] **S11 - Team page list**
+- [x] **S11 - Team page list**
   - Owner/Admin can view member list in `/team`.
 
 - [ ] **S12 - Invite member flow**
