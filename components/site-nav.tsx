@@ -22,6 +22,9 @@ export async function SiteNav() {
               <Link href="/settings/profile">Profile</Link>
               {canManageTenant ? (
                 <>
+                  <Link href="/settings/tenant" data-testid="nav-link-tenant-settings">
+                    Tenant settings
+                  </Link>
                   <Link href="/team" data-testid="nav-link-team">
                     Team
                   </Link>

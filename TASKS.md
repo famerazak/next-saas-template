@@ -40,7 +40,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S09 - Unauthorized route handling UX**
   - Disallowed users get clear “no access” UX (not broken page).
 
-- [ ] **S10 - Tenant settings page (owner/admin only)**
+- [x] **S10 - Tenant settings page (owner/admin only)**
   - Owner/Admin can edit tenant settings in `/settings/tenant`.
 
 ---

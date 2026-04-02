@@ -36,6 +36,10 @@ a {
   padding: 1.5rem;
 }
 
+.settings-card {
+  width: min(100%, 680px);
+}
+
 .auth-card h1 {
   margin: 0 0 0.35rem;
   font-size: 1.5rem;
@@ -113,6 +117,37 @@ a {
   font-size: 0.9rem;
 }
 
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.settings-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.settings-summary > div {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 0.8rem 0.9rem;
+}
+
+.settings-label {
+  display: block;
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .site-header {
   position: sticky;
   top: 0;
@@ -165,4 +200,14 @@ a {
   color: #0369a1;
   cursor: pointer;
   padding: 0;
+}
+
+@media (max-width: 640px) {
+  .settings-header {
+    flex-direction: column;
+  }
+
+  .settings-summary {
+    grid-template-columns: 1fr;
+  }
 }
