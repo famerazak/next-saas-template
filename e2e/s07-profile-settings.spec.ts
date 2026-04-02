@@ -12,7 +12,7 @@ test("S07: authenticated user can update profile info", async ({ page }) => {
   await page.getByLabel("Password").fill("supersecret");
   await page.getByRole("button", { name: "Log in" }).click();
 
-  await page.getByRole("link", { name: "Profile" }).click();
+  await page.getByTestId("header-profile-avatar").click();
   await expect(page).toHaveURL(/\/settings\/profile$/);
 
   await page.getByLabel("Full name").fill("Alex Johnson");
