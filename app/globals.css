@@ -369,3 +369,27 @@ a {
     align-items: flex-start;
   }
 }
+
+.accept-invite-button {
+  border: 0;
+  border-radius: 10px;
+  background: #0ea5e9;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.68rem 0.9rem;
+  cursor: pointer;
+}
+
+.accept-invite-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.dashboard-invites-card {
+  margin-top: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 1rem;
+}
