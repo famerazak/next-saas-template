@@ -156,3 +156,81 @@ export async function loadTeamMembersForSession(session: AppSession): Promise<Te
 
   return users;
 }
+
+export async function updateMemberRoleForSession(
+  session: AppSession,
+  targetUserId: string,
+  nextRole: Extract<TenantRole, "Admin" | "Member" | "Viewer">
+): Promise<TeamMember> {
+  if (!session.tenantId) {
+    throw new Error("Tenant context is required.");
+  }
+
+  if (targetUserId === session.userId) {
+    throw new Error("You cannot change your own role.");
+  }
+
+  const supabase = getServiceClient();
+  if (!supabase || process.env.E2E_AUTH_BYPASS === "1") {
+    const members = loadFromLocalStore(session);
+    const target = members.find((member) => member.id === targetUserId);
+    if (!target) {
+      throw new Error("Member not found.");
+    }
+    if (target.role === "Owner") {
+      throw new Error("Owner role cannot be changed here.");
+    }
+
+    const updated: TeamMember = {
+      ...target,
+      role: nextRole
+    };
+    const nextMembers = members.map((member) => (member.id === targetUserId ? updated : member));
+    getLocalTeamStore().set(session.tenantId, nextMembers);
+    return updated;
+  }
+
+  const { data: existing, error: lookupError } = await supabase
+    .from("memberships")
+    .select("user_id, role")
+    .eq("tenant_id", session.tenantId)
+    .eq("user_id", targetUserId)
+    .maybeSingle<MembershipRow>();
+
+  if (lookupError) {
+    throw new Error(lookupError.message);
+  }
+  if (!existing?.user_id) {
+    throw new Error("Member not found.");
+  }
+  if (normalizeRole(existing.role) === "Owner") {
+    throw new Error("Owner role cannot be changed here.");
+  }
+
+  const { error: updateError } = await supabase
+    .from("memberships")
+    .update({ role: nextRole.toLowerCase() })
+    .eq("tenant_id", session.tenantId)
+    .eq("user_id", targetUserId);
+
+  if (updateError) {
+    throw new Error(updateError.message);
+  }
+
+  let email = targetUserId;
+  let fullName = "";
+  try {
+    const result = await supabase.auth.admin.getUserById(targetUserId);
+    email = result.data.user?.email || targetUserId;
+  } catch {
+    // Keep fallback values when admin lookup is unavailable.
+  }
+
+  return {
+    id: targetUserId,
+    email,
+    fullName,
+    role: nextRole,
+    status: "Active"
+  };
+}

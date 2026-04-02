@@ -56,7 +56,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S13 - Accept invite flow + membership refresh** [auth][app]
   - Invited user can join tenant and member list updates without manual relogin.
 
-- [ ] **S14 - Change member role + team action blocking** [rbac][auth]
+- [x] **S14 - Change member role + team action blocking** [rbac][auth]
   - Owner/Admin can update role between Admin/Member/Viewer, and Member/Viewer cannot see or use team management controls.
 
 - [ ] **S15 - Remove/deactivate member**
