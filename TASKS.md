@@ -50,7 +50,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S11 - Team page list**
   - Owner/Admin can view member list in `/team`.
 
-- [ ] **S12 - Invite member flow**
+- [x] **S12 - Invite member flow**
   - Owner/Admin can send invite; invite appears as pending in UI.
 
 - [ ] **S13 - Accept invite flow**
