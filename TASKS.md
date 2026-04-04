@@ -59,7 +59,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S14 - Change member role + team action blocking** [rbac][auth]
   - Owner/Admin can update role between Admin/Member/Viewer, and Member/Viewer cannot see or use team management controls.
 
-- [ ] **S15 - Remove/deactivate member**
+- [x] **S15 - Remove/deactivate member**
   - Owner/Admin can remove member from tenant and the team list reflects the change immediately.
 
 - [ ] **S16 - Ownership transfer** [rbac][auth]

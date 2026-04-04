@@ -270,6 +270,20 @@ body::before {
   margin-bottom: 0;
 }
 
+.team-members-count-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0.3rem 0.82rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(248, 250, 252, 0.92);
+  color: #334155;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
 .team-members-table {
   display: grid;
   gap: 0;
@@ -326,6 +340,12 @@ body::before {
   justify-content: flex-end;
 }
 
+.team-members-action-stack {
+  display: grid;
+  gap: 0.45rem;
+  justify-items: stretch;
+}
+
 .team-role-control {
   display: flex;
   align-items: center;
@@ -352,6 +372,34 @@ body::before {
   opacity: 0.65;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+.team-member-remove {
+  border: 1px solid rgba(220, 38, 38, 0.18);
+  background: rgba(255, 255, 255, 0.82);
+  color: #b91c1c;
+  padding: 0.58rem 0.82rem;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease;
+}
+
+.team-member-remove:hover,
+.team-member-remove:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(220, 38, 38, 0.34);
+  background: rgba(254, 242, 242, 0.92);
+}
+
+.team-member-remove:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .team-role-static {
@@ -764,6 +812,10 @@ body::before {
 
   .team-members-action {
     justify-content: flex-start;
+  }
+
+  .team-members-action-stack {
+    width: 100%;
   }
 
   .team-role-control {
