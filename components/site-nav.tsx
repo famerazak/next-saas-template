@@ -53,6 +53,11 @@ export function buildSidebarLinks(session: AppSession): AppNavLink[] {
         testId: "sidebar-link-team"
       },
       {
+        href: "/roles-permissions",
+        label: "Roles & permissions",
+        testId: "sidebar-link-roles-permissions"
+      },
+      {
         href: "/billing",
         label: "Billing",
         testId: "sidebar-link-billing"
