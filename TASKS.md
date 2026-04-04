@@ -75,7 +75,7 @@ Each slice should ship something real a user can see/use.
 
 ## Slice 21-28: Security + 2FA + Session Management
 
-- [ ] **S21 - Security page shell + tenant policy placeholder + personal events** [security][ui]
+- [x] **S21 - Security page shell + tenant policy placeholder + personal events** [security][ui]
   - `/security` exists with 2FA/session sections, tenant policy placeholder, and personal security event history.
 
 - [ ] **S22 - User can enroll in 2FA** [security][auth]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S18 - Core app read/write gating`
+- [x] Current active slice: `S21 - Security page shell + tenant policy placeholder + personal events`
 - [ ] Link PR/branch next to each completed slice.

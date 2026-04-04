@@ -37,6 +37,11 @@ export function buildSidebarLinks(session: AppSession): AppNavLink[] {
       href: "/dashboard",
       label: "Dashboard",
       testId: "sidebar-link-dashboard"
+    },
+    {
+      href: "/security",
+      label: "Security",
+      testId: "sidebar-link-security"
     }
   ];
 
