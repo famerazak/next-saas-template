@@ -405,6 +405,66 @@ body::before {
   box-shadow: none;
 }
 
+.dashboard-billing-card {
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(29, 116, 212, 0.08), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 250, 252, 0.92));
+  padding: 1.1rem;
+  margin: 1rem 0;
+  box-shadow:
+    0 18px 30px rgba(15, 23, 42, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.dashboard-billing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.dashboard-billing-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.dashboard-billing-invoice-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(248, 250, 252, 0.96);
+  color: #334155;
+  padding: 0.38rem 0.8rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.dashboard-billing-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(29, 116, 212, 0.16);
+  background: rgba(219, 234, 254, 0.76);
+  color: #1d4ed8;
+  padding: 0.48rem 0.95rem;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.dashboard-billing-link:hover {
+  background: rgba(219, 234, 254, 0.92);
+}
+
 .permissions-card {
   width: min(100%, 1080px);
 }
@@ -664,6 +724,16 @@ body::before {
   padding: 1.35rem;
 }
 
+.billing-invoices-card {
+  border: 1px solid rgba(203, 213, 225, 0.72);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 250, 252, 0.92));
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  padding: 1.35rem;
+}
+
 .billing-webhook-summary-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -685,6 +755,13 @@ body::before {
 }
 
 .billing-webhook-activity-row {
+.billing-invoices-list {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.billing-invoice-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -696,15 +773,23 @@ body::before {
 }
 
 .billing-webhook-activity-row strong {
+.billing-invoice-row strong {
   display: block;
   color: #0f172a;
 }
 
 .billing-webhook-activity-row p {
+.billing-invoice-row p {
   margin: 0.35rem 0 0;
   color: var(--muted);
 }
 
+.billing-invoice-meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.55rem;
+  text-align: right;
+}
 .payment-setup-card {
   width: min(100%, 980px);
 }
@@ -1743,6 +1828,7 @@ body::before {
   }
 
   .billing-summary-grid,
+  .dashboard-billing-grid,
   .billing-ready-grid,
   .billing-webhook-summary-grid,
   .billing-payment-summary,
@@ -1836,6 +1922,17 @@ body::before {
 
   .dashboard-note-save {
     width: 100%;
+  }
+
+  .dashboard-billing-footer,
+  .billing-invoice-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .billing-invoice-meta {
+    justify-items: start;
+    text-align: left;
   }
 
   .team-members-action-stack {
