@@ -256,6 +256,117 @@ body::before {
   margin-top: 1rem;
 }
 
+.team-members-card {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 250, 252, 0.88));
+}
+
+.team-members-header {
+  margin-bottom: 0;
+}
+
+.team-members-table {
+  display: grid;
+  gap: 0;
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.team-members-table-header,
+.team-members-table-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.5fr) 0.75fr 0.7fr minmax(180px, 0.95fr);
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem 0.95rem;
+}
+
+.team-members-table-header {
+  background: rgba(241, 245, 249, 0.96);
+  color: #516074;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.team-members-table-row {
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.93rem;
+}
+
+.team-members-name {
+  font-weight: 600;
+}
+
+.team-member-primary {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.team-member-note {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.team-members-email,
+.team-members-status {
+  color: #475569;
+}
+
+.team-members-action {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.team-role-control {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.team-role-control select {
+  min-width: 124px;
+}
+
+.team-role-save {
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  background: linear-gradient(135deg, var(--accent) 0%, #2893ef 100%);
+  color: #ffffff;
+  padding: 0.58rem 0.82rem;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.16);
+}
+
+.team-role-save:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.team-role-static {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(255, 255, 255, 0.72);
+  color: #475569;
+  font-size: 0.86rem;
+}
+
 .team-invite-header {
   margin-bottom: 0.85rem;
 }
@@ -644,5 +755,25 @@ body::before {
   .team-invite-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .team-members-table-header,
+  .team-members-table-row {
+    grid-template-columns: 1fr;
+  }
+
+  .team-members-action {
+    justify-content: flex-start;
+  }
+
+  .team-role-control {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .team-role-control select,
+  .team-role-save {
+    width: 100%;
   }
 }
