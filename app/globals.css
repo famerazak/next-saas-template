@@ -402,6 +402,128 @@ body::before {
   width: min(100%, 1080px);
 }
 
+.security-page-card {
+  width: min(100%, 1080px);
+}
+
+.security-role-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0.3rem 0.82rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(248, 250, 252, 0.92);
+  color: #334155;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.security-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.security-section {
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.security-section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.security-section-header h2 {
+  margin: 0;
+}
+
+.security-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0.28rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.security-status-badge.is-pending {
+  color: #9a3412;
+  background: rgba(255, 237, 213, 0.92);
+  border-color: rgba(249, 115, 22, 0.2);
+}
+
+.security-status-badge.is-good {
+  color: #166534;
+  background: rgba(220, 252, 231, 0.88);
+  border-color: rgba(34, 197, 94, 0.18);
+}
+
+.security-status-badge.is-neutral {
+  color: #475569;
+  background: rgba(241, 245, 249, 0.96);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.security-placeholder-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.security-session-card,
+.security-policy-item,
+.security-event-item {
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 14px;
+  background: rgba(248, 250, 252, 0.92);
+  padding: 0.9rem;
+}
+
+.security-session-card {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.security-policy-grid,
+.security-events-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.security-policy-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.security-policy-item p,
+.security-event-item p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+  font-size: 0.9rem;
+}
+
+.security-event-item.tone-good {
+  background: rgba(240, 253, 244, 0.92);
+}
+
+.security-event-item.tone-attention {
+  background: rgba(255, 247, 237, 0.92);
+}
+
 .permissions-summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1113,6 +1235,11 @@ body::before {
     grid-template-columns: 1fr;
   }
 
+  .security-grid,
+  .security-policy-grid {
+    grid-template-columns: 1fr;
+  }
+
   .permissions-matrix {
     display: grid;
     gap: 0.75rem;
@@ -1129,6 +1256,10 @@ body::before {
     border: 1px solid rgba(203, 213, 225, 0.8);
     border-radius: 16px;
     background: rgba(255, 255, 255, 0.88);
+  }
+
+  .security-section-header {
+    flex-direction: column;
   }
 
   .team-members-action {
