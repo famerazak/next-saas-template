@@ -21,7 +21,7 @@ test("S08: admin sees tenant admin sidebar links", async ({ page }) => {
   await login(page, "admin@example.com");
   await expect(page.getByTestId("sidebar-link-security")).toBeVisible();
   await expect(page.getByTestId("sidebar-link-team")).toBeVisible();
-  await expect(page.getByTestId("sidebar-link-billing")).toBeVisible();
+  await expect(page.getByTestId("sidebar-link-billing")).toHaveCount(0);
   await expect(page.getByTestId("sidebar-link-audit-logs")).toBeVisible();
 });
 

@@ -29,9 +29,9 @@ test.describe("App shell navigation", () => {
 test.describe("App shell mobile drawer", () => {
   test.use({ viewport: { width: 430, height: 932 } });
 
-  test("mobile admin can open the sidebar drawer", async ({ page }) => {
+  test("mobile owner can open the sidebar drawer", async ({ page }) => {
     await page.goto("/login");
-    await page.getByLabel("Email").fill("admin@example.com");
+    await page.getByLabel("Email").fill("owner@example.com");
     await page.getByLabel("Password").fill("supersecret");
     await page.getByRole("button", { name: "Log in" }).click();
 

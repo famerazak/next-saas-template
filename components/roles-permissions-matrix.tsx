@@ -37,10 +37,10 @@ const PERMISSION_ROWS: PermissionRow[] = [
   {
     capability: "Billing and plan controls",
     owner: "Full access",
-    admin: "Full access",
+    admin: "No access",
     member: "No access",
     viewer: "No access",
-    note: "Billing stays inside the tenant-admin area of the starter."
+    note: "Only the owner can manage billing so subscription authority stays explicit."
   },
   {
     capability: "Audit logs and exports",

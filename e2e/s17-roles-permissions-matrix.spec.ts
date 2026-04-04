@@ -30,6 +30,7 @@ test("S17: admin can open the roles and permissions matrix from the sidebar", as
   await expect(page.getByTestId("roles-permissions-summary")).toContainText("Owner");
   await expect(page.getByTestId("roles-permissions-summary")).toContainText("Viewer");
   await expect(page.getByTestId("roles-permissions-matrix")).toContainText("Team management");
+  await expect(page.getByTestId("roles-permissions-matrix")).toContainText("Only the owner can manage billing");
   await expect(page.getByTestId("roles-permissions-matrix")).toContainText("Ownership transfer remains owner-only.");
   await expect(page.getByTestId("permission-row-roles-permissions-reference")).toContainText("Read only");
 });

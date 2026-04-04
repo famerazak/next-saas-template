@@ -409,6 +409,188 @@ body::before {
   width: min(100%, 1080px);
 }
 
+.billing-card {
+  width: min(100%, 980px);
+  border: 1px solid rgba(203, 213, 225, 0.72);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(29, 116, 212, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 250, 252, 0.92));
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  padding: 1.35rem;
+}
+
+.billing-owner-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(29, 116, 212, 0.2);
+  background: rgba(219, 234, 254, 0.88);
+  color: #1d4ed8;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.billing-summary-grid,
+.billing-ready-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.billing-summary-grid {
+  margin-bottom: 1rem;
+}
+
+.billing-summary-card,
+.billing-ready-card,
+.billing-estimate-card {
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.billing-summary-card,
+.billing-ready-card {
+  padding: 1rem;
+}
+
+.billing-summary-card strong,
+.billing-ready-grid strong,
+.billing-estimate-card strong {
+  display: block;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.billing-summary-card p,
+.billing-ready-grid p,
+.billing-estimate-card p {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.billing-checkout-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.billing-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.billing-plan-option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: start;
+  border: 1px solid rgba(203, 213, 225, 0.82);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+  padding: 0.95rem;
+  text-align: left;
+}
+
+.billing-plan-option.is-selected {
+  border-color: rgba(29, 116, 212, 0.42);
+  box-shadow: inset 0 0 0 1px rgba(29, 116, 212, 0.1);
+  background: rgba(239, 246, 255, 0.9);
+}
+
+.billing-plan-option strong {
+  display: block;
+  margin-bottom: 0.28rem;
+}
+
+.billing-plan-option p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.billing-plan-option span {
+  white-space: nowrap;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.billing-checkout-controls {
+  display: grid;
+  grid-template-columns: 180px 180px minmax(0, 1fr) 190px;
+  gap: 0.85rem;
+  align-items: end;
+}
+
+.billing-checkout-controls label {
+  display: grid;
+  gap: 0.35rem;
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.billing-checkout-controls input,
+.billing-checkout-controls select {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  border-radius: 12px;
+  padding: 0.68rem 0.72rem;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+  color: var(--ink);
+}
+
+.billing-checkout-controls button {
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent) 0%, #2893ef 100%);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.78rem 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.2);
+}
+
+.billing-checkout-controls button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.billing-estimate-card {
+  display: grid;
+  gap: 0.2rem;
+  min-height: 100%;
+  padding: 0.9rem;
+}
+
+.billing-ready-card {
+  margin-top: 1rem;
+}
+
+.billing-ready-grid {
+  margin-top: 0.85rem;
+}
+
+.billing-ready-header {
+  margin-bottom: 0;
+}
+
+.billing-monospace {
+  font-family: "SFMono-Regular", "Menlo", monospace;
+  font-size: 0.86rem;
+  word-break: break-all;
+}
+
 .security-page-card {
   width: min(100%, 1080px);
 }
@@ -1414,6 +1596,10 @@ body::before {
     grid-template-columns: 1fr;
   }
 
+  .billing-summary-grid,
+  .billing-ready-grid,
+  .billing-plan-grid,
+  .billing-checkout-controls,
   .security-grid,
   .security-policy-grid,
   .two-factor-setup-grid {
@@ -1470,6 +1656,14 @@ body::before {
 
   .backup-codes-grid {
     grid-template-columns: 1fr;
+  }
+
+  .billing-plan-option {
+    grid-template-columns: 1fr;
+  }
+
+  .billing-plan-option span {
+    white-space: normal;
   }
 
   .team-members-action {
