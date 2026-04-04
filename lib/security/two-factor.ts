@@ -1,4 +1,5 @@
 import QRCode from "qrcode";
+import { createHash, randomBytes } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { buildOtpAuthUri, formatTotpSecret, generateTotpSecret, maskTotpSecret, verifyTotpToken } from "@/lib/security/totp";
 
@@ -10,6 +11,8 @@ export type TwoFactorState = {
   isEnabled: boolean;
   maskedSecret: string | null;
   enrolledAt: string | null;
+  backupCodesRemaining: number;
+  backupCodesGeneratedAt: string | null;
   pendingSecret: string | null;
   pendingQrCodeDataUrl: string | null;
   pendingOtpAuthUri: string | null;
@@ -20,6 +23,8 @@ type TwoFactorRecord = {
   email: string;
   enabledSecret: string | null;
   enabledAt: string | null;
+  backupCodeHashes: string[];
+  backupCodesGeneratedAt: string | null;
   pendingSecret: string | null;
   pendingStartedAt: string | null;
 };
@@ -29,6 +34,8 @@ type TwoFactorRow = {
   email: string | null;
   totp_secret: string | null;
   enabled_at: string | null;
+  backup_code_hashes: string[] | null;
+  backup_codes_generated_at: string | null;
   pending_secret: string | null;
   pending_started_at: string | null;
 };
@@ -72,6 +79,8 @@ function normalizeRecord(userId: string, email: string, record?: Partial<TwoFact
     email,
     enabledSecret: record?.enabledSecret ?? null,
     enabledAt: record?.enabledAt ?? null,
+    backupCodeHashes: record?.backupCodeHashes ?? [],
+    backupCodesGeneratedAt: record?.backupCodesGeneratedAt ?? null,
     pendingSecret: record?.pendingSecret ?? null,
     pendingStartedAt: record?.pendingStartedAt ?? null
   };
@@ -86,6 +95,8 @@ function buildState(userId: string, email: string, record?: Partial<TwoFactorRec
     isEnabled: Boolean(normalized.enabledSecret),
     maskedSecret: normalized.enabledSecret ? maskTotpSecret(normalized.enabledSecret) : null,
     enrolledAt: normalized.enabledAt,
+    backupCodesRemaining: normalized.backupCodeHashes.length,
+    backupCodesGeneratedAt: normalized.backupCodesGeneratedAt,
     pendingSecret: normalized.pendingSecret ? formatTotpSecret(normalized.pendingSecret) : null,
     pendingQrCodeDataUrl: null,
     pendingOtpAuthUri: normalized.pendingSecret
@@ -141,7 +152,7 @@ export async function loadTwoFactorStateForUser(userId: string, email: string): 
 
   const { data, error } = await supabase
     .from("user_two_factor_factors")
-    .select("user_id, email, totp_secret, enabled_at, pending_secret, pending_started_at")
+    .select("user_id, email, totp_secret, enabled_at, backup_code_hashes, backup_codes_generated_at, pending_secret, pending_started_at")
     .eq("user_id", userId)
     .maybeSingle<TwoFactorRow>();
 
@@ -153,6 +164,8 @@ export async function loadTwoFactorStateForUser(userId: string, email: string): 
     email: data.email ?? email,
     enabledSecret: data.totp_secret,
     enabledAt: data.enabled_at,
+    backupCodeHashes: data.backup_code_hashes ?? [],
+    backupCodesGeneratedAt: data.backup_codes_generated_at,
     pendingSecret: data.pending_secret,
     pendingStartedAt: data.pending_started_at
   });
@@ -262,13 +275,52 @@ export async function completeTwoFactorEnrollmentForUser(
     pendingStartedAt: null
   });
 
-  return buildState(userId, email, {
-    email,
-    enabledSecret: rawSecret,
-    enabledAt,
-    pendingSecret: null,
-    pendingStartedAt: null
+  return buildState(userId, email, readLocalRecord(userId, email));
+}
+
+export async function generateBackupCodesForUser(userId: string, email: string): Promise<{
+  twoFactor: TwoFactorState;
+  backupCodes: string[];
+}> {
+  const currentState = await loadTwoFactorStateForUser(userId, email);
+  if (!currentState.isEnabled) {
+    throw new Error("Enable 2FA before generating backup codes.");
+  }
+
+  const backupCodes = createBackupCodes();
+  const backupCodeHashes = backupCodes.map(hashBackupCode);
+  const generatedAt = new Date().toISOString();
+  const supabase = getServiceClient();
+
+  if (supabase) {
+    const { error } = await supabase.from("user_two_factor_factors").upsert(
+      {
+        user_id: userId,
+        email,
+        backup_code_hashes: backupCodeHashes,
+        backup_codes_generated_at: generatedAt,
+        updated_at: generatedAt
+      },
+      { onConflict: "user_id" }
+    );
+
+    if (!error) {
+      return {
+        twoFactor: await loadTwoFactorStateForUser(userId, email),
+        backupCodes
+      };
+    }
+  }
+
+  const localRecord = writeLocalRecord(userId, email, {
+    backupCodeHashes,
+    backupCodesGeneratedAt: generatedAt
   });
+
+  return {
+    twoFactor: buildState(userId, email, localRecord),
+    backupCodes
+  };
 }
 
 export async function verifyTwoFactorChallengeForUser(
@@ -302,4 +354,16 @@ export async function verifyTwoFactorChallengeForUser(
   }
 
   return currentState;
+}
+
+function createBackupCodes(count = 8): string[] {
+  return Array.from({ length: count }, () => {
+    const raw = randomBytes(5).toString("base64url").toUpperCase().replace(/[^A-Z2-9]/g, "");
+    const padded = `${raw}ABCDEFGHJKMNPQRSTVWXYZ23456789`;
+    return `${padded.slice(0, 4)}-${padded.slice(4, 8)}`;
+  });
+}
+
+function hashBackupCode(code: string): string {
+  return createHash("sha256").update(code).digest("hex");
 }

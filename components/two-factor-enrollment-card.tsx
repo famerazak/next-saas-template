@@ -137,7 +137,7 @@ export function TwoFactorEnrollmentCard({ initialState }: TwoFactorEnrollmentCar
           <div>
             <span className="settings-label">Authenticator app</span>
             <strong data-testid="security-2fa-enabled-label">Enabled</strong>
-            <p className="auth-subtitle">Your account now requires a time-based authenticator code in the next login slice.</p>
+            <p className="auth-subtitle">Your account now requires a time-based authenticator code during login.</p>
           </div>
           <div className="two-factor-summary-meta">
             <span data-testid="security-2fa-masked-secret">{state.maskedSecret}</span>
