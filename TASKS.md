@@ -84,7 +84,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S23 - User can complete 2FA challenge on login** [security][auth]
   - If enrolled, login requires 2FA challenge step.
 
-- [ ] **S24 - Backup codes flow** [security]
+- [x] **S24 - Backup codes flow** [security]
   - User can view/generate backup codes in security screen.
 
 - [ ] **S25 - Session list + revoke** [security]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S23 - User can complete 2FA challenge on login`
+- [x] Current active slice: `S24 - Backup codes flow`
 - [ ] Link PR/branch next to each completed slice.

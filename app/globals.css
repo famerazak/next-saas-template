@@ -496,6 +496,68 @@ body::before {
   gap: 0.85rem;
 }
 
+.backup-codes-card,
+.backup-codes-reveal {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.backup-codes-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 16px;
+  background: rgba(248, 250, 252, 0.92);
+  padding: 0.95rem;
+}
+
+.backup-codes-summary strong {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 1rem;
+}
+
+.backup-codes-summary .auth-subtitle {
+  margin: 0.45rem 0 0;
+}
+
+.backup-codes-generated-at {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  background: rgba(255, 255, 255, 0.94);
+  padding: 0.65rem 0.8rem;
+  color: #0f172a;
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+.backup-codes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.backup-codes-grid code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  background: rgba(255, 255, 255, 0.94);
+  padding: 0.7rem 0.85rem;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
 .two-factor-setup-grid {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
@@ -1352,6 +1414,19 @@ body::before {
 
   .two-factor-summary-meta {
     min-width: 0;
+  }
+
+  .backup-codes-summary {
+    flex-direction: column;
+  }
+
+  .backup-codes-generated-at {
+    justify-content: flex-start;
+    white-space: normal;
+  }
+
+  .backup-codes-grid {
+    grid-template-columns: 1fr;
   }
 
   .team-members-action {

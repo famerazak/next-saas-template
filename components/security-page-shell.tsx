@@ -1,5 +1,6 @@
 import type { AppSession } from "@/lib/auth/session";
 import type { TwoFactorState } from "@/lib/security/two-factor";
+import { BackupCodesCard } from "@/components/backup-codes-card";
 import { TwoFactorEnrollmentCard } from "@/components/two-factor-enrollment-card";
 
 type SecurityPageShellProps = {
@@ -33,6 +34,20 @@ function buildSecurityEvents(session: AppSession, twoFactorState: TwoFactorState
           title: "2FA enrollment pending",
           detail: "You have not enrolled a TOTP factor yet. Start setup from the security page.",
           tone: "attention"
+        },
+    twoFactorState.isEnabled
+      ? {
+          title: twoFactorState.backupCodesRemaining > 0 ? "Backup codes ready" : "Backup codes pending",
+          detail:
+            twoFactorState.backupCodesRemaining > 0
+              ? `${twoFactorState.backupCodesRemaining} recovery codes are available for this account.`
+              : "Generate recovery codes so you can still sign in if your authenticator app is unavailable.",
+          tone: twoFactorState.backupCodesRemaining > 0 ? "good" : "attention"
+        }
+      : {
+          title: "Recovery codes locked",
+          detail: "Enable 2FA before recovery codes can be generated.",
+          tone: "neutral"
         },
     {
       title: "Session controls staged",
@@ -77,6 +92,11 @@ export function SecurityPageShell({ session, twoFactorState }: SecurityPageShell
               </span>
             </div>
             <TwoFactorEnrollmentCard initialState={twoFactorState} />
+            <BackupCodesCard
+              isTwoFactorEnabled={twoFactorState.isEnabled}
+              initialRemaining={twoFactorState.backupCodesRemaining}
+              initialGeneratedAt={twoFactorState.backupCodesGeneratedAt}
+            />
           </section>
 
           <section className="security-section" data-testid="security-sessions-section">
