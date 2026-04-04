@@ -9,3 +9,7 @@ export function canAccessTenantAdminArea(session: AppSession): boolean {
 export function canTransferTenantOwnership(session: AppSession): boolean {
   return (session.role ?? "Member") === "Owner";
 }
+
+export function canWriteCoreApp(session: AppSession): boolean {
+  return TENANT_ADMIN_ROLES.has(session.role ?? "Member");
+}

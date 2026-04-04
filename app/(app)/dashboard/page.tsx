@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
+import { DashboardTenantNote } from "@/components/dashboard-tenant-note";
 import { PendingInviteCard } from "@/components/pending-invite-card";
+import { canWriteCoreApp } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
 import { loadPendingInvitesForEmail } from "@/lib/team/invites";
+import { loadTenantSettingsForSession } from "@/lib/tenant/settings";
 
 export default async function DashboardPage() {
   const session = await getAppSessionFromCookies();
@@ -13,6 +16,7 @@ export default async function DashboardPage() {
   const role = session.role ?? "Member";
   const email = session.email;
   const pendingInvites = await loadPendingInvitesForEmail(email);
+  const tenantSettings = await loadTenantSettingsForSession(session);
 
   return (
     <main className="page-shell">
@@ -22,6 +26,13 @@ export default async function DashboardPage() {
         <p data-testid="dashboard-email">Email: {email}</p>
         <p data-testid="tenant-name">Tenant: {tenantName}</p>
         <p data-testid="tenant-role">Role: {role}</p>
+        <DashboardTenantNote
+          tenantId={session.tenantId ?? email}
+          tenantName={tenantName}
+          role={role}
+          initialNote={tenantSettings.dashboardNote}
+          canWrite={canWriteCoreApp(session)}
+        />
         {pendingInvites.length > 0 ? <PendingInviteCard initialInvites={pendingInvites} /> : null}
       </section>
     </main>

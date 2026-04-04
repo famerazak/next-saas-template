@@ -68,7 +68,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S17 - Roles & permissions matrix page** [rbac][ui]
   - `/roles-permissions` shows read-only matrix for Owner/Admin.
 
-- [ ] **S18 - Core app read/write gating** [rbac][app]
+- [x] **S18 - Core app read/write gating** [rbac][app]
   - `Viewer` is read-only in `/app/*`; other roles follow matrix.
 
 ---
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S17 - Roles & permissions matrix page`
+- [x] Current active slice: `S18 - Core app read/write gating`
 - [ ] Link PR/branch next to each completed slice.
