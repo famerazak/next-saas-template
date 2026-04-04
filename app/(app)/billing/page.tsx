@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { BillingCheckoutCard } from "@/components/billing-checkout-card";
+import { BillingInvoicesList } from "@/components/billing-invoices-list";
 import { BillingPaymentMethodCard } from "@/components/billing-payment-method-card";
 import { BillingWebhookMonitorCard } from "@/components/billing-webhook-monitor-card";
 import { NoAccessCard } from "@/components/no-access-card";
@@ -40,6 +41,7 @@ export default async function BillingPage() {
           initialPaymentMethod={snapshot.paymentMethod}
         />
         <BillingWebhookMonitorCard initialSnapshot={snapshot} />
+        <BillingInvoicesList invoices={snapshot.invoices} />
       </div>
     </main>
   );

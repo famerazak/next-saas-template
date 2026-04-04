@@ -45,6 +45,7 @@ export type BillingPaymentMethodSetup = {
 export type BillingWebhookEventType = "checkout.session.completed" | "invoice.paid";
 export type BillingWebhookDeliveryStatus = "Processed" | "Duplicate";
 export type BillingInvoiceSyncStatus = "Pending" | "Paid";
+export type BillingInvoiceStatus = "Paid" | "Open" | "Draft";
 
 export type BillingWebhookActivity = {
   eventId: string;
@@ -52,6 +53,15 @@ export type BillingWebhookActivity = {
   deliveryStatus: BillingWebhookDeliveryStatus;
   receivedAt: string;
   summary: string;
+};
+
+export type BillingInvoice = {
+  invoiceId: string;
+  periodLabel: string;
+  status: BillingInvoiceStatus;
+  amount: number;
+  issuedAt: string;
+  lineItemSummary: string;
 };
 
 export type StripeWebhookEvent = {
@@ -85,6 +95,7 @@ export type BillingSnapshot = {
   processedWebhookCount: number;
   duplicateWebhookCount: number;
   webhookActivity: BillingWebhookActivity[];
+  invoices: BillingInvoice[];
 };
 
 type LocalBillingState = {
@@ -257,6 +268,52 @@ function buildWebhookSummary(event: StripeWebhookEvent) {
   }).format(amount)}.`;
 }
 
+function buildInvoiceDate(daysAgo: number): string {
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+  return date.toISOString();
+}
+
+function buildInvoices(
+  checkout: BillingCheckout | null,
+  recommendedSeatCount: number
+): BillingInvoice[] {
+  const currentPlanId = checkout?.selectedPlanId ?? "starter";
+  const currentPlan = resolvePlan(currentPlanId);
+  const currentSeatCount = checkout?.seatCount ?? recommendedSeatCount;
+  const currentAmount =
+    checkout?.estimatedMonthlyTotal ?? calculateEstimatedMonthlyTotal(currentPlan.id, currentSeatCount);
+  const priorPlan = currentPlan.id === "growth" ? resolvePlan("starter") : currentPlan;
+  const priorSeatCount = Math.max(currentSeatCount - 1, 1);
+
+  return [
+    {
+      invoiceId: `inv_${currentPlan.id}_open`,
+      periodLabel: "Current billing cycle",
+      status: "Open",
+      amount: currentAmount,
+      issuedAt: checkout?.startedAt ?? buildInvoiceDate(3),
+      lineItemSummary: `${currentPlan.name} plan for ${currentSeatCount} ${currentSeatCount === 1 ? "seat" : "seats"}`
+    },
+    {
+      invoiceId: `inv_${priorPlan.id}_paid`,
+      periodLabel: "Previous billing cycle",
+      status: "Paid",
+      amount: calculateEstimatedMonthlyTotal(priorPlan.id, priorSeatCount),
+      issuedAt: buildInvoiceDate(32),
+      lineItemSummary: `${priorPlan.name} plan for ${priorSeatCount} ${priorSeatCount === 1 ? "seat" : "seats"}`
+    },
+    {
+      invoiceId: `inv_setup_draft`,
+      periodLabel: "Starter setup",
+      status: "Draft",
+      amount: currentPlan.monthlyBase,
+      issuedAt: buildInvoiceDate(61),
+      lineItemSummary: "Initial workspace activation and billing profile review"
+    }
+  ];
+}
+
 export function calculateEstimatedMonthlyTotal(planId: BillingPlanId, seatCount: number): number {
   const plan = resolvePlan(planId);
   return plan.monthlyBase + plan.monthlyPerSeat * seatCount;
@@ -290,7 +347,8 @@ export async function loadBillingSnapshotForSession(
     latestInvoiceStatus: state?.latestInvoiceStatus ?? "Pending",
     processedWebhookCount: state?.processedWebhookCount ?? 0,
     duplicateWebhookCount: state?.duplicateWebhookCount ?? 0,
-    webhookActivity: state?.webhookActivity ?? []
+    webhookActivity: state?.webhookActivity ?? [],
+    invoices: buildInvoices(checkout, recommendedSeatCount)
   };
 }
 

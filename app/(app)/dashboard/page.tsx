@@ -1,9 +1,12 @@
 import { redirect } from "next/navigation";
+import { DashboardBillingSummary } from "@/components/dashboard-billing-summary";
 import { DashboardTenantNote } from "@/components/dashboard-tenant-note";
 import { PendingInviteCard } from "@/components/pending-invite-card";
 import { canWriteCoreApp } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
+import { loadBillingSnapshotForSession } from "@/lib/billing/store";
 import { loadPendingInvitesForEmail } from "@/lib/team/invites";
+import { loadTeamMembersForSession } from "@/lib/team/store";
 import { loadTenantSettingsForSession } from "@/lib/tenant/settings";
 
 type DashboardPageProps = {
@@ -24,6 +27,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const email = session.email;
   const pendingInvites = await loadPendingInvitesForEmail(email);
   const tenantSettings = await loadTenantSettingsForSession(session);
+  const members = await loadTeamMembersForSession(session);
+  const billingSnapshot = await loadBillingSnapshotForSession(session, {
+    recommendedSeatCount: members.length
+  });
 
   return (
     <main className="page-shell">
@@ -33,6 +40,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <p data-testid="dashboard-email">Email: {email}</p>
         <p data-testid="tenant-name">Tenant: {tenantName}</p>
         <p data-testid="tenant-role">Role: {role}</p>
+        <DashboardBillingSummary session={session} snapshot={billingSnapshot} />
         <DashboardTenantNote
           tenantId={session.tenantId ?? email}
           tenantName={tenantName}
