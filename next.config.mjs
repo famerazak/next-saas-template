@@ -5,7 +5,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  outputFileTracingRoot: __dirname
+  outputFileTracingRoot: __dirname,
+  distDir: process.env.NEXT_DIST_DIR || ".next"
 };
 
 export default nextConfig;

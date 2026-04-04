@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "dev:e2e": "NEXT_DIST_DIR=.next-e2e next dev",
+    "build": "rm -rf .next && next build",
+    "clean:next": "rm -rf .next .next-e2e",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test:e2e": "playwright test"
+    "test:e2e": "./scripts/run-playwright-e2e.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.8",

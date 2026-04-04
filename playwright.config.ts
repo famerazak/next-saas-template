@@ -1,6 +1,6 @@
 import { defineConfig } from "@playwright/test";
 
-const port = Number(process.env.PORT || 3000);
+const port = Number(process.env.PLAYWRIGHT_PORT || 3100);
 
 export default defineConfig({
   testDir: "./e2e",
@@ -15,9 +15,9 @@ export default defineConfig({
     video: "on"
   },
   webServer: {
-    command: `E2E_AUTH_BYPASS=1 npm run dev -- --hostname 127.0.0.1 --port ${port}`,
+    command: `E2E_AUTH_BYPASS=1 npm run dev:e2e -- --hostname 127.0.0.1 --port ${port}`,
     url: `http://127.0.0.1:${port}`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000
   }
 });
