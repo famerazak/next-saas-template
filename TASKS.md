@@ -100,7 +100,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S29 - Owner billing access + checkout start** [billing]
   - Owner can access `/billing`, others cannot, and owner can start plan/seat checkout from the billing UI.
 
-- [ ] **S31 - Add/update card details** [billing]
+- [x] **S31 - Add/update card details** [billing]
   - Owner can add or update payment method via Stripe flow.
 
 - [ ] **S32 - Billing summary + invoices list** [billing][app]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S29 - Owner billing access + checkout start`
+- [x] Current active slice: `S31 - Add/update card details`
 - [ ] Link PR/branch next to each completed slice.

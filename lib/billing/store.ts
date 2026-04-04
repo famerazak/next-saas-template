@@ -1,6 +1,7 @@
 import type { AppSession } from "@/lib/auth/session";
 
 export type BillingPlanId = "starter" | "growth";
+export type CardBrand = "Visa" | "Mastercard" | "American Express" | "Unknown";
 
 export type BillingPlan = {
   id: BillingPlanId;
@@ -21,6 +22,25 @@ export type BillingCheckout = {
   status: "ready";
 };
 
+export type BillingPaymentMethod = {
+  paymentMethodId: string;
+  brand: CardBrand;
+  last4: string;
+  expiryMonth: number;
+  expiryYear: number;
+  cardholderName: string;
+  billingEmail: string;
+  updatedAt: string;
+};
+
+export type BillingPaymentMethodSetup = {
+  setupId: string;
+  setupUrl: string;
+  returnUrl: string;
+  startedAt: string;
+  status: "ready";
+};
+
 export type BillingSnapshot = {
   tenantId: string;
   tenantName: string;
@@ -30,13 +50,21 @@ export type BillingSnapshot = {
   estimatedMonthlyTotal: number;
   availablePlans: BillingPlan[];
   checkout: BillingCheckout | null;
+  paymentMethod: BillingPaymentMethod | null;
+  paymentMethodSetup: BillingPaymentMethodSetup | null;
 };
 
-type LocalBillingStore = Map<string, BillingCheckout>;
+type LocalBillingState = {
+  checkout: BillingCheckout | null;
+  paymentMethod: BillingPaymentMethod | null;
+  paymentMethodSetup: BillingPaymentMethodSetup | null;
+};
+
+type LocalBillingStore = Map<string, LocalBillingState>;
 
 declare global {
   // eslint-disable-next-line no-var
-  var __localBillingCheckoutStore: LocalBillingStore | undefined;
+  var __localBillingStore: LocalBillingStore | undefined;
 }
 
 const BILLING_PLANS: BillingPlan[] = [
@@ -57,15 +85,49 @@ const BILLING_PLANS: BillingPlan[] = [
 ];
 
 function getLocalBillingStore(): LocalBillingStore {
-  if (!globalThis.__localBillingCheckoutStore) {
-    globalThis.__localBillingCheckoutStore = new Map<string, BillingCheckout>();
+  if (!globalThis.__localBillingStore) {
+    globalThis.__localBillingStore = new Map<string, LocalBillingState>();
   }
 
-  return globalThis.__localBillingCheckoutStore;
+  return globalThis.__localBillingStore;
+}
+
+function getBillingState(tenantId: string): LocalBillingState {
+  const store = getLocalBillingStore();
+  const existing = store.get(tenantId);
+  if (existing) {
+    return existing;
+  }
+
+  const fresh: LocalBillingState = {
+    checkout: null,
+    paymentMethod: null,
+    paymentMethodSetup: null
+  };
+  store.set(tenantId, fresh);
+  return fresh;
+}
+
+function saveBillingState(tenantId: string, state: LocalBillingState): LocalBillingState {
+  getLocalBillingStore().set(tenantId, state);
+  return state;
 }
 
 function resolvePlan(planId: BillingPlanId): BillingPlan {
   return BILLING_PLANS.find((plan) => plan.id === planId) ?? BILLING_PLANS[0];
+}
+
+function normalizeCardBrand(cardNumber: string): CardBrand {
+  if (cardNumber.startsWith("4")) {
+    return "Visa";
+  }
+  if (/^5[1-5]/.test(cardNumber) || /^2(2[2-9]|[3-6]|7[01])/.test(cardNumber)) {
+    return "Mastercard";
+  }
+  if (/^3[47]/.test(cardNumber)) {
+    return "American Express";
+  }
+  return "Unknown";
 }
 
 export function calculateEstimatedMonthlyTotal(planId: BillingPlanId, seatCount: number): number {
@@ -82,7 +144,8 @@ export async function loadBillingSnapshotForSession(
   options?: { recommendedSeatCount?: number }
 ): Promise<BillingSnapshot> {
   const recommendedSeatCount = Math.max(options?.recommendedSeatCount ?? 1, 1);
-  const checkout = session.tenantId ? getLocalBillingStore().get(session.tenantId) ?? null : null;
+  const state = session.tenantId ? getBillingState(session.tenantId) : null;
+  const checkout = state?.checkout ?? null;
   const fallbackPlanId = checkout?.selectedPlanId ?? "starter";
 
   return {
@@ -94,7 +157,9 @@ export async function loadBillingSnapshotForSession(
     estimatedMonthlyTotal:
       checkout?.estimatedMonthlyTotal ?? calculateEstimatedMonthlyTotal(fallbackPlanId, recommendedSeatCount),
     availablePlans: getBillingPlanCatalog(),
-    checkout
+    checkout,
+    paymentMethod: state?.paymentMethod ?? null,
+    paymentMethodSetup: state?.paymentMethodSetup ?? null
   };
 }
 
@@ -106,6 +171,7 @@ export async function startBillingCheckoutForSession(
     throw new Error("Tenant context is required.");
   }
 
+  const state = getBillingState(session.tenantId);
   const plan = resolvePlan(input.selectedPlanId);
   const checkoutId = `chk_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
   const checkout: BillingCheckout = {
@@ -119,10 +185,70 @@ export async function startBillingCheckoutForSession(
     status: "ready"
   };
 
-  getLocalBillingStore().set(session.tenantId, checkout);
+  saveBillingState(session.tenantId, {
+    ...state,
+    checkout
+  });
 
   return {
     checkout,
+    persistedToDatabase: false
+  };
+}
+
+export async function startPaymentMethodSetupForSession(
+  session: AppSession
+): Promise<{ setup: BillingPaymentMethodSetup; persistedToDatabase: boolean }> {
+  if (!session.tenantId) {
+    throw new Error("Tenant context is required.");
+  }
+
+  const setupId = `seti_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
+  const setup: BillingPaymentMethodSetup = {
+    setupId,
+    setupUrl: `/billing/payment-method?setup=${setupId}`,
+    returnUrl: "/billing?payment_method=updated",
+    startedAt: new Date().toISOString(),
+    status: "ready"
+  };
+
+  return {
+    setup,
+    persistedToDatabase: false
+  };
+}
+
+export async function savePaymentMethodForSession(
+  session: AppSession,
+  input: {
+    setupId: string;
+    cardholderName: string;
+    billingEmail: string;
+    cardNumber: string;
+    expiryMonth: number;
+    expiryYear: number;
+  }
+): Promise<{ paymentMethod: BillingPaymentMethod; persistedToDatabase: boolean }> {
+  if (!session.tenantId) {
+    throw new Error("Tenant context is required.");
+  }
+  if (!input.setupId.trim().startsWith("seti_")) {
+    throw new Error("Payment method setup session not found.");
+  }
+
+  const paymentMethod: BillingPaymentMethod = {
+    paymentMethodId: `pm_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`,
+    brand: normalizeCardBrand(input.cardNumber),
+    last4: input.cardNumber.slice(-4),
+    expiryMonth: input.expiryMonth,
+    expiryYear: input.expiryYear,
+    cardholderName: input.cardholderName,
+    billingEmail: input.billingEmail,
+    updatedAt: new Date().toISOString()
+  };
+
+  return {
+    paymentMethod,
     persistedToDatabase: false
   };
 }

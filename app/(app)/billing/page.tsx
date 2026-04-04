@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { BillingCheckoutCard } from "@/components/billing-checkout-card";
+import { BillingPaymentMethodCard } from "@/components/billing-payment-method-card";
 import { NoAccessCard } from "@/components/no-access-card";
 import { canManageTenantBilling } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
@@ -23,15 +24,21 @@ export default async function BillingPage() {
 
   return (
     <main className="page-shell">
-      <BillingCheckoutCard
-        tenantName={snapshot.tenantName}
-        billingOwnerEmail={snapshot.billingOwnerEmail}
-        initialSeatCount={snapshot.seatCount}
-        initialCurrentPlanName={snapshot.currentPlanName}
-        initialEstimatedMonthlyTotal={snapshot.estimatedMonthlyTotal}
-        availablePlans={snapshot.availablePlans}
-        initialCheckout={snapshot.checkout}
-      />
+      <div className="billing-stack">
+        <BillingCheckoutCard
+          tenantName={snapshot.tenantName}
+          billingOwnerEmail={snapshot.billingOwnerEmail}
+          initialSeatCount={snapshot.seatCount}
+          initialCurrentPlanName={snapshot.currentPlanName}
+          initialEstimatedMonthlyTotal={snapshot.estimatedMonthlyTotal}
+          availablePlans={snapshot.availablePlans}
+          initialCheckout={snapshot.checkout}
+        />
+        <BillingPaymentMethodCard
+          tenantId={snapshot.tenantId || snapshot.billingOwnerEmail}
+          initialPaymentMethod={snapshot.paymentMethod}
+        />
+      </div>
     </main>
   );
 }
