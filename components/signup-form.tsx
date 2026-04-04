@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { formatAuthAbuseMessage } from "@/lib/auth/abuse";
 
 type SignupState = {
   loading: boolean;
@@ -36,7 +37,7 @@ export function SignupForm() {
     if (!response.ok) {
       setState({
         loading: false,
-        error: payload.error ?? "Unable to create account. Please try again."
+        error: formatAuthAbuseMessage(payload, "Unable to create account. Please try again.")
       });
       return;
     }

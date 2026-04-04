@@ -1,6 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import {
+  checkLoginAbuse,
+  clearFailedLogins,
+  getRequestIp,
+  normalizeProviderAuthAbuse,
+  recordFailedLogin
+} from "@/lib/auth/abuse";
 import { createActiveSession } from "@/lib/auth/session-registry";
 import { clearAppSession, clearPreAuthChallenge, setAppSession, setPreAuthChallenge } from "@/lib/auth/session";
 import { loadProfileForUser } from "@/lib/profile/store";
@@ -40,7 +47,28 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
   }
 
+  const abuseKey = `${parsed.email}:${getRequestIp(request)}`;
+  const blocked = checkLoginAbuse(abuseKey);
+  if (blocked) {
+    return NextResponse.json(blocked, {
+      status: 429,
+      headers: { "Retry-After": String(blocked.retryAfterSeconds ?? 600) }
+    });
+  }
+
   if (process.env.E2E_AUTH_BYPASS === "1") {
+    if (parsed.password !== "supersecret") {
+      const limited = recordFailedLogin(abuseKey);
+      if (limited) {
+        return NextResponse.json(limited, {
+          status: 429,
+          headers: { "Retry-After": String(limited.retryAfterSeconds ?? 600) }
+        });
+      }
+
+      return NextResponse.json({ error: "Invalid credentials." }, { status: 400 });
+    }
+
     const requiresTwoFactor = await isTwoFactorEnabledForUser(`e2e-${parsed.email}`, parsed.email);
     const tenant =
       resolveLocalTenantContextForEmail(parsed.email) ??
@@ -73,6 +101,7 @@ export async function POST(request: Request) {
       });
     } else {
       clearPreAuthChallenge(response);
+      clearFailedLogins(abuseKey);
       await createActiveSession(sessionPayload, request.headers.get("user-agent"));
       setAppSession(response, sessionPayload);
     }
@@ -105,6 +134,24 @@ export async function POST(request: Request) {
   });
 
   if (error) {
+    const normalized = normalizeProviderAuthAbuse(error);
+    if (normalized) {
+      return NextResponse.json(normalized, {
+        status: normalized.code === "captcha_required" ? 403 : 429,
+        headers: normalized.retryAfterSeconds
+          ? { "Retry-After": String(normalized.retryAfterSeconds) }
+          : undefined
+      });
+    }
+
+    const limited = recordFailedLogin(abuseKey);
+    if (limited) {
+      return NextResponse.json(limited, {
+        status: 429,
+        headers: { "Retry-After": String(limited.retryAfterSeconds ?? 600) }
+      });
+    }
+
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
@@ -167,6 +214,7 @@ export async function POST(request: Request) {
     });
   } else {
     clearPreAuthChallenge(response);
+    clearFailedLogins(abuseKey);
     await createActiveSession(sessionPayload, request.headers.get("user-agent"));
     setAppSession(response, sessionPayload);
   }
