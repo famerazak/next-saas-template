@@ -109,7 +109,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S35 - Webhook ingestion + idempotent behavior** [webhook][billing]
   - Stripe webhook events are accepted, reflected in app state, and duplicate events do not create duplicate state changes.
 
-- [ ] **S36 - Failed webhook retry + dead-letter visibility** [platform][webhook][billing]
+- [x] **S36 - Failed webhook retry + dead-letter visibility** [platform][webhook][billing]
   - Platform admin can retry failed events from `/platform/webhooks-jobs` and inspect dead-letter diagnostics.
 
 ---
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S35 - Webhook ingestion + idempotent behavior`
+- [x] Current active slice: `S36 - Failed webhook retry + dead-letter visibility`
 - [ ] Link PR/branch next to each completed slice.

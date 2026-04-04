@@ -46,6 +46,7 @@ export type BillingWebhookEventType = "checkout.session.completed" | "invoice.pa
 export type BillingWebhookDeliveryStatus = "Processed" | "Duplicate";
 export type BillingInvoiceSyncStatus = "Pending" | "Paid";
 export type BillingInvoiceStatus = "Paid" | "Open" | "Draft";
+export type BillingWebhookDeadLetterStatus = "Pending retry" | "Retried";
 
 export type BillingWebhookActivity = {
   eventId: string;
@@ -64,6 +65,20 @@ export type BillingInvoice = {
   lineItemSummary: string;
 };
 
+export type BillingWebhookDeadLetter = {
+  deadLetterId: string;
+  tenantId: string;
+  eventId: string;
+  eventType: BillingWebhookEventType;
+  status: BillingWebhookDeadLetterStatus;
+  failedAt: string;
+  failureReason: string;
+  summary: string;
+  retryCount: number;
+  lastRetriedAt?: string;
+  payload: string;
+};
+
 export type StripeWebhookEvent = {
   id: string;
   type: BillingWebhookEventType;
@@ -76,6 +91,7 @@ export type StripeWebhookEvent = {
       seatCount?: number;
       invoiceId?: string;
       amount?: number;
+      forceFailure?: boolean;
     };
   };
 };
@@ -96,6 +112,12 @@ export type BillingSnapshot = {
   duplicateWebhookCount: number;
   webhookActivity: BillingWebhookActivity[];
   invoices: BillingInvoice[];
+  deadLetters: BillingWebhookDeadLetter[];
+};
+
+export type PlatformWebhookJobsSnapshot = {
+  pendingDeadLetters: BillingWebhookDeadLetter[];
+  recentRetries: BillingWebhookDeadLetter[];
 };
 
 type LocalBillingState = {
@@ -108,6 +130,7 @@ type LocalBillingState = {
   processedWebhookIds: string[];
   webhookActivity: BillingWebhookActivity[];
   latestReplayableEvent: StripeWebhookEvent | null;
+  deadLetters: BillingWebhookDeadLetter[];
 };
 
 type LocalBillingStore = Map<string, LocalBillingState>;
@@ -160,7 +183,8 @@ function getBillingState(tenantId: string): LocalBillingState {
     duplicateWebhookCount: 0,
     processedWebhookIds: [],
     webhookActivity: [],
-    latestReplayableEvent: null
+    latestReplayableEvent: null,
+    deadLetters: []
   };
   store.set(tenantId, fresh);
   return fresh;
@@ -246,7 +270,8 @@ function parseWebhookEvent(payload: string): StripeWebhookEvent {
         planId: parsed.data?.object?.planId,
         seatCount: parsed.data?.object?.seatCount,
         invoiceId: parsed.data?.object?.invoiceId,
-        amount: parsed.data?.object?.amount
+        amount: parsed.data?.object?.amount,
+        forceFailure: parsed.data?.object?.forceFailure
       }
     }
   };
@@ -348,7 +373,8 @@ export async function loadBillingSnapshotForSession(
     processedWebhookCount: state?.processedWebhookCount ?? 0,
     duplicateWebhookCount: state?.duplicateWebhookCount ?? 0,
     webhookActivity: state?.webhookActivity ?? [],
-    invoices: buildInvoices(checkout, recommendedSeatCount)
+    invoices: buildInvoices(checkout, recommendedSeatCount),
+    deadLetters: state?.deadLetters ?? []
   };
 }
 
@@ -457,6 +483,45 @@ export function createSignedStripeWebhookPayload(event: StripeWebhookEvent) {
   };
 }
 
+function upsertDeadLetter(
+  state: LocalBillingState,
+  event: StripeWebhookEvent,
+  payload: string,
+  reason: string
+): BillingWebhookDeadLetter[] {
+  const existing = state.deadLetters.find((entry) => entry.eventId === event.id);
+  if (existing) {
+    return state.deadLetters.map((entry) =>
+      entry.eventId === event.id
+        ? {
+            ...entry,
+            status: "Pending retry",
+            failedAt: new Date().toISOString(),
+            failureReason: reason
+          }
+        : entry
+    );
+  }
+
+  const created: BillingWebhookDeadLetter = {
+    deadLetterId: `dl_${crypto.randomUUID().replace(/-/g, "").slice(0, 14)}`,
+    tenantId: event.data.object.tenantId,
+    eventId: event.id,
+    eventType: event.type,
+    status: "Pending retry",
+    failedAt: new Date().toISOString(),
+    failureReason: reason,
+    summary: buildWebhookSummary(event),
+    retryCount: 0,
+    payload
+  };
+
+  return [
+    created,
+    ...state.deadLetters
+  ].slice(0, 20);
+}
+
 export async function processStripeWebhookPayload(
   payload: string,
   signatureHeader: string | null
@@ -495,53 +560,67 @@ export async function processStripeWebhookPayload(
     };
   }
 
-  let nextCheckout = state.checkout;
-  let nextInvoiceStatus = state.latestInvoiceStatus;
+  try {
+    if (event.data.object.forceFailure) {
+      throw new Error("Forced webhook handler failure for retry testing.");
+    }
 
-  if (event.type === "checkout.session.completed") {
-    const planId = event.data.object.planId ?? state.checkout?.selectedPlanId ?? "starter";
-    const plan = resolvePlan(planId);
-    const seatCount = Math.max(event.data.object.seatCount ?? state.checkout?.seatCount ?? 1, 1);
-    nextCheckout = {
-      checkoutId: event.data.object.checkoutId ?? state.checkout?.checkoutId ?? `chk_${event.id.slice(4, 12)}`,
-      checkoutUrl: state.checkout?.checkoutUrl ?? `/billing?checkout=ready&checkout_id=${event.id}`,
-      selectedPlanId: plan.id,
-      selectedPlanName: plan.name,
-      seatCount,
-      estimatedMonthlyTotal: calculateEstimatedMonthlyTotal(plan.id, seatCount),
-      startedAt: event.createdAt,
-      status: "ready"
+    let nextCheckout = state.checkout;
+    let nextInvoiceStatus = state.latestInvoiceStatus;
+
+    if (event.type === "checkout.session.completed") {
+      const planId = event.data.object.planId ?? state.checkout?.selectedPlanId ?? "starter";
+      const plan = resolvePlan(planId);
+      const seatCount = Math.max(event.data.object.seatCount ?? state.checkout?.seatCount ?? 1, 1);
+      nextCheckout = {
+        checkoutId: event.data.object.checkoutId ?? state.checkout?.checkoutId ?? `chk_${event.id.slice(4, 12)}`,
+        checkoutUrl: state.checkout?.checkoutUrl ?? `/billing?checkout=ready&checkout_id=${event.id}`,
+        selectedPlanId: plan.id,
+        selectedPlanName: plan.name,
+        seatCount,
+        estimatedMonthlyTotal: calculateEstimatedMonthlyTotal(plan.id, seatCount),
+        startedAt: event.createdAt,
+        status: "ready"
+      };
+      nextInvoiceStatus = "Pending";
+    }
+
+    if (event.type === "invoice.paid") {
+      nextInvoiceStatus = "Paid";
+    }
+
+    const activity: BillingWebhookActivity = {
+      eventId: event.id,
+      eventType: event.type,
+      deliveryStatus: "Processed",
+      receivedAt: new Date().toISOString(),
+      summary: buildWebhookSummary(event)
     };
-    nextInvoiceStatus = "Pending";
+
+    saveBillingState(event.data.object.tenantId, {
+      ...state,
+      checkout: nextCheckout,
+      latestInvoiceStatus: nextInvoiceStatus,
+      processedWebhookCount: state.processedWebhookCount + 1,
+      processedWebhookIds: [...state.processedWebhookIds, event.id],
+      webhookActivity: [activity, ...state.webhookActivity].slice(0, 8),
+      latestReplayableEvent: event,
+      deadLetters: state.deadLetters.filter((entry) => entry.eventId !== event.id || entry.status !== "Pending retry")
+    });
+
+    return {
+      deliveryStatus: "Processed",
+      activity,
+      tenantId: event.data.object.tenantId
+    };
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : "Webhook handler failed.";
+    saveBillingState(event.data.object.tenantId, {
+      ...state,
+      deadLetters: upsertDeadLetter(state, event, payload, reason)
+    });
+    throw new Error(reason);
   }
-
-  if (event.type === "invoice.paid") {
-    nextInvoiceStatus = "Paid";
-  }
-
-  const activity: BillingWebhookActivity = {
-    eventId: event.id,
-    eventType: event.type,
-    deliveryStatus: "Processed",
-    receivedAt: new Date().toISOString(),
-    summary: buildWebhookSummary(event)
-  };
-
-  saveBillingState(event.data.object.tenantId, {
-    ...state,
-    checkout: nextCheckout,
-    latestInvoiceStatus: nextInvoiceStatus,
-    processedWebhookCount: state.processedWebhookCount + 1,
-    processedWebhookIds: [...state.processedWebhookIds, event.id],
-    webhookActivity: [activity, ...state.webhookActivity].slice(0, 8),
-    latestReplayableEvent: event
-  });
-
-  return {
-    deliveryStatus: "Processed",
-    activity,
-    tenantId: event.data.object.tenantId
-  };
 }
 
 export async function simulateStripeWebhookForSession(
@@ -595,4 +674,60 @@ export async function simulateStripeWebhookForSession(
     deliveryStatus: result.deliveryStatus,
     eventId: event.id
   };
+}
+
+export async function loadPlatformWebhookJobsSnapshot(): Promise<PlatformWebhookJobsSnapshot> {
+  const states = [...getLocalBillingStore().values()];
+  const deadLetters = states.flatMap((state) => state.deadLetters);
+
+  return {
+    pendingDeadLetters: deadLetters
+      .filter((entry) => entry.status === "Pending retry")
+      .sort((left, right) => right.failedAt.localeCompare(left.failedAt)),
+    recentRetries: deadLetters
+      .filter((entry) => entry.status === "Retried")
+      .sort((left, right) => (right.lastRetriedAt ?? "").localeCompare(left.lastRetriedAt ?? ""))
+      .slice(0, 10)
+  };
+}
+
+export async function retryWebhookDeadLetter(deadLetterId: string): Promise<{ eventId: string }> {
+  for (const [tenantId, state] of getLocalBillingStore().entries()) {
+    const deadLetter = state.deadLetters.find((entry) => entry.deadLetterId === deadLetterId);
+    if (!deadLetter) {
+      continue;
+    }
+
+    const parsed = parseWebhookEvent(deadLetter.payload);
+    const retryEvent: StripeWebhookEvent = {
+      ...parsed,
+      data: {
+        object: {
+          ...parsed.data.object,
+          forceFailure: false
+        }
+      }
+    };
+    const signed = createSignedStripeWebhookPayload(retryEvent);
+    await processStripeWebhookPayload(signed.payload, signed.signature);
+
+    const nextState = getBillingState(tenantId);
+    const retriedRecord: BillingWebhookDeadLetter = {
+      ...deadLetter,
+      status: "Retried",
+      retryCount: deadLetter.retryCount + 1,
+      lastRetriedAt: new Date().toISOString()
+    };
+    saveBillingState(tenantId, {
+      ...nextState,
+      deadLetters: [
+        retriedRecord,
+        ...nextState.deadLetters.filter((entry) => entry.deadLetterId !== deadLetterId)
+      ].slice(0, 20)
+    });
+
+    return { eventId: deadLetter.eventId };
+  }
+
+  throw new Error("Dead-letter delivery not found.");
 }

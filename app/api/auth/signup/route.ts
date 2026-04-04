@@ -6,7 +6,7 @@ import { createActiveSession } from "@/lib/auth/session-registry";
 import { clearPreAuthChallenge, setAppSession } from "@/lib/auth/session";
 import { getSupabaseEnv } from "@/lib/supabase/config";
 import { bootstrapTenantForUser } from "@/lib/tenant/bootstrap";
-import { deriveTenantContextFromEmail } from "@/lib/tenant/context";
+import { deriveTenantContextFromEmail, isPlatformAdminEmail } from "@/lib/tenant/context";
 
 type SignupRequest = {
   email?: string;
@@ -51,6 +51,7 @@ export async function POST(request: Request) {
       tenantId: tenant.tenantId,
       tenantName: tenant.tenantName,
       role: tenant.role,
+      isPlatformAdmin: isPlatformAdminEmail(parsed.email),
       fullName: "",
       jobTitle: ""
     };
@@ -62,6 +63,7 @@ export async function POST(request: Request) {
         tenantId: tenant.tenantId,
         tenantName: tenant.tenantName,
         role: tenant.role,
+        isPlatformAdmin: isPlatformAdminEmail(parsed.email),
         fullName: "",
         jobTitle: ""
       },
@@ -158,6 +160,7 @@ export async function POST(request: Request) {
       tenantId: bootstrap.tenantId,
       tenantName: bootstrap.tenantName,
       role: bootstrap.role,
+      isPlatformAdmin: isPlatformAdminEmail(data.user.email),
       fullName: "",
       jobTitle: ""
     },
@@ -170,6 +173,7 @@ export async function POST(request: Request) {
     tenantId: bootstrap.tenantId,
     tenantName: bootstrap.tenantName,
     role: bootstrap.role,
+    isPlatformAdmin: isPlatformAdminEmail(data.user.email),
     fullName: "",
     jobTitle: ""
   };

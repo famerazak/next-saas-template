@@ -8,6 +8,10 @@ export type TenantContext = {
   role: TenantRole;
 };
 
+function normalizeEmail(value: string) {
+  return value.trim().toLowerCase();
+}
+
 type ResolveTenantContextInput = {
   userId: string;
   email: string;
@@ -62,6 +66,24 @@ export function inferTenantRoleFromEmail(email: string): TenantRole {
   if (local.includes("member")) return "Member";
   if (local.includes("viewer")) return "Viewer";
   return "Owner";
+}
+
+export function isPlatformAdminEmail(email: string): boolean {
+  const normalized = normalizeEmail(email);
+  const configured = (process.env.PLATFORM_ADMIN_EMAILS || "")
+    .split(",")
+    .map((entry) => normalizeEmail(entry))
+    .filter(Boolean);
+
+  if (configured.includes(normalized)) {
+    return true;
+  }
+
+  if (process.env.E2E_AUTH_BYPASS === "1") {
+    return normalized.includes("platform");
+  }
+
+  return false;
 }
 
 export function deriveTenantContextFromEmail(email: string, role: TenantRole): TenantContext {

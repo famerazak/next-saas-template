@@ -17,3 +17,7 @@ export function canTransferTenantOwnership(session: AppSession): boolean {
 export function canWriteCoreApp(session: AppSession): boolean {
   return TENANT_ADMIN_ROLES.has(session.role ?? "Member");
 }
+
+export function canAccessPlatformAdminArea(session: AppSession): boolean {
+  return session.isPlatformAdmin === true;
+}
