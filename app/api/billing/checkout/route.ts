@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordTenantAuditEventForSession } from "@/lib/audit/store";
 import { canManageTenantBilling } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
 import { startBillingCheckoutForSession, type BillingPlanId } from "@/lib/billing/store";
@@ -63,6 +64,18 @@ export async function POST(request: Request) {
 
   try {
     const started = await startBillingCheckoutForSession(session, { selectedPlanId, seatCount });
+    await recordTenantAuditEventForSession(session, {
+      action: "billing.checkout.started",
+      summary: `Started ${started.checkout.selectedPlanName} checkout for ${started.checkout.seatCount} seats.`,
+      targetType: "billing_checkout",
+      targetId: started.checkout.checkoutId,
+      targetLabel: started.checkout.selectedPlanName,
+      metadata: {
+        selectedPlanId: started.checkout.selectedPlanId,
+        seatCount: started.checkout.seatCount,
+        estimatedMonthlyTotal: started.checkout.estimatedMonthlyTotal
+      }
+    });
     return NextResponse.json(
       {
         checkout: started.checkout,

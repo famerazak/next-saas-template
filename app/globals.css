@@ -1496,6 +1496,52 @@ body::before {
   font-size: 0.9rem;
 }
 
+.audit-log-card {
+  width: min(100%, 1080px);
+}
+
+.audit-log-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.audit-log-row {
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  padding: 1rem;
+}
+
+.audit-log-row-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.audit-log-row-copy p {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+}
+
+.audit-log-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.7rem;
+  color: #475569;
+  font-size: 0.84rem;
+}
+
+.audit-log-meta span {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(241, 245, 249, 0.95);
+  border: 1px solid rgba(203, 213, 225, 0.84);
+  padding: 0.24rem 0.6rem;
+}
+
 .accept-invite-button {
   border: 0;
   border-radius: 12px;

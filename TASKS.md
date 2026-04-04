@@ -116,7 +116,7 @@ Each slice should ship something real a user can see/use.
 
 ## Slice 38-47: Tenant Audit Logs + Exports
 
-- [ ] **S38 - Tenant audit event model wired** [app]
+- [x] **S38 - Tenant audit event model wired** [app]
   - Key privileged actions produce audit entries.
 
 - [ ] **S39 - Tenant audit logs page + filters/search + non-admin denial** [ui][app]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S36 - Failed webhook retry + dead-letter visibility`
+- [x] Current active slice: `S38 - Tenant audit event model wired`
 - [ ] Link PR/branch next to each completed slice.

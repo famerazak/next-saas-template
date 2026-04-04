@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordTenantAuditEventForSession } from "@/lib/audit/store";
 import { canManageTenantBilling } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
 import { savePaymentMethodForSession } from "@/lib/billing/store";
@@ -130,6 +131,18 @@ export async function POST(request: Request) {
       cardNumber,
       expiryMonth,
       expiryYear
+    });
+    await recordTenantAuditEventForSession(session, {
+      action: "billing.payment_method.updated",
+      summary: `Updated billing card ending in ${saved.paymentMethod.last4}.`,
+      targetType: "payment_method",
+      targetId: saved.paymentMethod.paymentMethodId,
+      targetLabel: `${saved.paymentMethod.brand} •••• ${saved.paymentMethod.last4}`,
+      metadata: {
+        cardBrand: saved.paymentMethod.brand,
+        last4: saved.paymentMethod.last4,
+        billingEmail: saved.paymentMethod.billingEmail
+      }
     });
 
     return NextResponse.json(

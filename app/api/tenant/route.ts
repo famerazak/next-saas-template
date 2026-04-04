@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordTenantAuditEventForSession } from "@/lib/audit/store";
 import { canAccessTenantAdminArea } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies, setAppSession } from "@/lib/auth/session";
 import { saveTenantNameForSession } from "@/lib/tenant/settings";
@@ -43,6 +44,17 @@ export async function POST(request: Request) {
   }
 
   const saved = await saveTenantNameForSession(session, tenantName);
+  await recordTenantAuditEventForSession(session, {
+    action: "tenant.settings.updated",
+    summary: `Updated tenant settings for ${tenantName}.`,
+    targetType: "tenant",
+    targetId: session.tenantId,
+    targetLabel: tenantName,
+    metadata: {
+      previousTenantName: session.tenantName ?? "Workspace",
+      nextTenantName: saved.settings.tenantName
+    }
+  });
   const response = NextResponse.json(
     {
       settings: {
