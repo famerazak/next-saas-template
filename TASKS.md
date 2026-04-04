@@ -122,7 +122,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S39 - Tenant audit logs page + filters/search + non-admin denial** [ui][app]
   - Owner/Admin can open `/audit-logs`, filter/search events, and Member/Viewer are denied access and export actions.
 
-- [ ] **S42 - Audit exports (CSV + JSON) with tenant boundary safety** [app]
+- [x] **S42 - Audit exports (CSV + JSON) with tenant boundary safety** [app]
   - Owner/Admin can export tenant audit logs to CSV and JSON, and exports contain only current-tenant events.
 
 - [ ] **S45 - Platform-initiated tenant changes appear in tenant logs** [platform][security]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S39 - Tenant audit logs page + filters/search + non-admin denial`
+- [x] Current active slice: `S42 - Audit exports (CSV + JSON) with tenant boundary safety`
 - [ ] Link PR/branch next to each completed slice.

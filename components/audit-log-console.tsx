@@ -62,24 +62,22 @@ export function AuditLogConsole({ events }: AuditLogConsoleProps) {
           <p className="auth-subtitle">Search the current tenant history and narrow it to the actions you need.</p>
         </div>
         <div className="audit-log-toolbar-actions">
-          <button
-            type="button"
+          <a
+            href="/api/audit-logs/export?format=csv"
             className="audit-log-export-button"
             data-testid="audit-export-csv-button"
-            disabled
-            title="CSV export lands in S42."
+            download
           >
             Export CSV
-          </button>
-          <button
-            type="button"
+          </a>
+          <a
+            href="/api/audit-logs/export?format=json"
             className="audit-log-export-button"
             data-testid="audit-export-json-button"
-            disabled
-            title="JSON export lands in S42."
+            download
           >
             Export JSON
-          </button>
+          </a>
         </div>
       </div>
 
