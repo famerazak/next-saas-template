@@ -405,66 +405,6 @@ body::before {
   box-shadow: none;
 }
 
-.dashboard-billing-card {
-  border: 1px solid rgba(203, 213, 225, 0.8);
-  border-radius: 22px;
-  background:
-    radial-gradient(circle at top right, rgba(29, 116, 212, 0.08), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 250, 252, 0.92));
-  padding: 1.1rem;
-  margin: 1rem 0;
-  box-shadow:
-    0 18px 30px rgba(15, 23, 42, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78);
-}
-
-.dashboard-billing-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.85rem;
-  margin-top: 1rem;
-}
-
-.dashboard-billing-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.85rem;
-  flex-wrap: wrap;
-  margin-top: 1rem;
-}
-
-.dashboard-billing-invoice-pill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 38px;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(248, 250, 252, 0.96);
-  color: #334155;
-  padding: 0.38rem 0.8rem;
-  font-size: 0.84rem;
-  font-weight: 600;
-}
-
-.dashboard-billing-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  border-radius: 999px;
-  border: 1px solid rgba(29, 116, 212, 0.16);
-  background: rgba(219, 234, 254, 0.76);
-  color: #1d4ed8;
-  padding: 0.48rem 0.95rem;
-  text-decoration: none;
-  font-weight: 700;
-}
-
-.dashboard-billing-link:hover {
-  background: rgba(219, 234, 254, 0.92);
-}
-
 .permissions-card {
   width: min(100%, 1080px);
 }
@@ -724,16 +664,6 @@ body::before {
   padding: 1.35rem;
 }
 
-.billing-invoices-card {
-  border: 1px solid rgba(203, 213, 225, 0.72);
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 250, 252, 0.92));
-  box-shadow:
-    0 18px 40px rgba(15, 23, 42, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
-  padding: 1.35rem;
-}
-
 .billing-webhook-summary-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -754,14 +684,7 @@ body::before {
   margin-top: 1rem;
 }
 
-.billing-invoices-list {
-  display: grid;
-  gap: 0.85rem;
-  margin-top: 1rem;
-}
-
-.billing-webhook-activity-row,
-.billing-invoice-row {
+.billing-webhook-activity-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -772,24 +695,83 @@ body::before {
   padding: 1rem;
 }
 
-.billing-webhook-activity-row strong,
-.billing-invoice-row strong {
+.billing-webhook-activity-row strong {
   display: block;
   color: #0f172a;
 }
 
-.billing-webhook-activity-row p,
-.billing-invoice-row p {
+.billing-webhook-activity-row p {
   margin: 0.35rem 0 0;
   color: var(--muted);
 }
 
-.billing-invoice-meta {
+.platform-webhook-card {
+  width: min(100%, 1080px);
+  display: grid;
+  gap: 1rem;
+}
+
+.platform-webhook-section {
+  border: 1px solid rgba(203, 213, 225, 0.72);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 250, 252, 0.92));
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  padding: 1.35rem;
+}
+
+.platform-webhook-section-header {
+  margin-bottom: 1rem;
+}
+
+.platform-webhook-section-header h2 {
+  margin: 0;
+}
+
+.platform-webhook-section-header p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+}
+
+.platform-webhook-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.platform-webhook-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+  padding: 1rem;
+}
+
+.platform-webhook-row strong {
+  display: block;
+  color: #0f172a;
+}
+
+.platform-webhook-row p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+}
+
+.platform-webhook-row-actions {
   display: grid;
   justify-items: end;
-  gap: 0.55rem;
-  text-align: right;
+  gap: 0.65rem;
 }
+
+.platform-webhook-retry-count {
+  color: #475569;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
 .payment-setup-card {
   width: min(100%, 980px);
 }
@@ -1828,7 +1810,6 @@ body::before {
   }
 
   .billing-summary-grid,
-  .dashboard-billing-grid,
   .billing-ready-grid,
   .billing-webhook-summary-grid,
   .billing-payment-summary,
@@ -1911,6 +1892,15 @@ body::before {
     align-items: flex-start;
   }
 
+  .platform-webhook-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .platform-webhook-row-actions {
+    justify-items: start;
+  }
+
   .dashboard-note-header {
     flex-direction: column;
   }
@@ -1922,17 +1912,6 @@ body::before {
 
   .dashboard-note-save {
     width: 100%;
-  }
-
-  .dashboard-billing-footer,
-  .billing-invoice-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .billing-invoice-meta {
-    justify-items: start;
-    text-align: left;
   }
 
   .team-members-action-stack {

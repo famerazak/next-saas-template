@@ -68,6 +68,7 @@ export async function POST(request: Request) {
     tenantId: challenge.tenantId,
     tenantName: challenge.tenantName,
     role: challenge.role,
+    isPlatformAdmin: challenge.isPlatformAdmin,
     fullName: challenge.fullName,
     jobTitle: challenge.jobTitle
   };

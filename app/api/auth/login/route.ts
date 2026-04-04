@@ -17,6 +17,7 @@ import { resolveLocalTenantContextForEmail } from "@/lib/team/store";
 import {
   deriveTenantContextFromEmail,
   inferTenantRoleFromEmail,
+  isPlatformAdminEmail,
   resolvePrimaryTenantContextForUser
 } from "@/lib/tenant/context";
 
@@ -81,7 +82,8 @@ export async function POST(request: Request) {
         email: parsed.email,
         tenantId: tenant.tenantId,
         tenantName: tenant.tenantName,
-        role: tenant.role
+        role: tenant.role,
+        isPlatformAdmin: isPlatformAdminEmail(parsed.email)
       },
       { status: 200 }
     );
@@ -91,7 +93,8 @@ export async function POST(request: Request) {
       sessionId: randomUUID(),
       tenantId: tenant.tenantId,
       tenantName: tenant.tenantName,
-      role: tenant.role
+      role: tenant.role,
+      isPlatformAdmin: isPlatformAdminEmail(parsed.email)
     };
     if (requiresTwoFactor) {
       clearAppSession(response);
@@ -191,6 +194,7 @@ export async function POST(request: Request) {
       tenantId: tenant.tenantId,
       tenantName: tenant.tenantName,
       role: tenant.role,
+      isPlatformAdmin: isPlatformAdminEmail(data.user.email),
       fullName: profile?.fullName ?? "",
       jobTitle: profile?.jobTitle ?? ""
     },
@@ -203,6 +207,7 @@ export async function POST(request: Request) {
     tenantId: tenant.tenantId,
     tenantName: tenant.tenantName,
     role: tenant.role,
+    isPlatformAdmin: isPlatformAdminEmail(data.user.email),
     fullName: profile?.fullName ?? "",
     jobTitle: profile?.jobTitle ?? ""
   };

@@ -12,6 +12,7 @@ export type AppSession = {
   tenantId?: string;
   tenantName?: string;
   role?: TenantRole;
+  isPlatformAdmin?: boolean;
   fullName?: string;
   jobTitle?: string;
 };
