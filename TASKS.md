@@ -65,7 +65,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S16 - Ownership transfer** [rbac][auth]
   - Owner can transfer ownership to another eligible member.
 
-- [ ] **S17 - Roles & permissions matrix page** [rbac][ui]
+- [x] **S17 - Roles & permissions matrix page** [rbac][ui]
   - `/roles-permissions` shows read-only matrix for Owner/Admin.
 
 - [ ] **S18 - Core app read/write gating** [rbac][app]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S16 - Ownership transfer`
+- [x] Current active slice: `S17 - Roles & permissions matrix page`
 - [ ] Link PR/branch next to each completed slice.
