@@ -1,4 +1,6 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
+import { createActiveSession } from "@/lib/auth/session-registry";
 import {
   clearPreAuthChallenge,
   getPreAuthChallengeFromCookies,
@@ -59,15 +61,18 @@ export async function POST(request: Request) {
   const response = contentType.includes("application/json")
     ? NextResponse.json({ redirectTo: "/dashboard" }, { status: 200 })
     : NextResponse.redirect(buildRedirectUrl(request, "/dashboard"), { status: 303 });
-  clearPreAuthChallenge(response);
-  setAppSession(response, {
+  const sessionPayload = {
     userId: challenge.userId,
     email: challenge.email,
+    sessionId: randomUUID(),
     tenantId: challenge.tenantId,
     tenantName: challenge.tenantName,
     role: challenge.role,
     fullName: challenge.fullName,
     jobTitle: challenge.jobTitle
-  });
+  };
+  clearPreAuthChallenge(response);
+  await createActiveSession(sessionPayload, request.headers.get("user-agent"));
+  setAppSession(response, sessionPayload);
   return response;
 }

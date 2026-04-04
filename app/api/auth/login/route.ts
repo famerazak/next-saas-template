@@ -1,5 +1,7 @@
+import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { createActiveSession } from "@/lib/auth/session-registry";
 import { clearAppSession, clearPreAuthChallenge, setAppSession, setPreAuthChallenge } from "@/lib/auth/session";
 import { loadProfileForUser } from "@/lib/profile/store";
 import { isTwoFactorEnabledForUser } from "@/lib/security/two-factor";
@@ -58,6 +60,7 @@ export async function POST(request: Request) {
     const sessionPayload = {
       userId: `e2e-${parsed.email}`,
       email: parsed.email,
+      sessionId: randomUUID(),
       tenantId: tenant.tenantId,
       tenantName: tenant.tenantName,
       role: tenant.role
@@ -70,6 +73,7 @@ export async function POST(request: Request) {
       });
     } else {
       clearPreAuthChallenge(response);
+      await createActiveSession(sessionPayload, request.headers.get("user-agent"));
       setAppSession(response, sessionPayload);
     }
     return response;
@@ -148,6 +152,7 @@ export async function POST(request: Request) {
   const sessionPayload = {
     userId: data.user.id,
     email: data.user.email,
+    sessionId: randomUUID(),
     tenantId: tenant.tenantId,
     tenantName: tenant.tenantName,
     role: tenant.role,
@@ -162,6 +167,7 @@ export async function POST(request: Request) {
     });
   } else {
     clearPreAuthChallenge(response);
+    await createActiveSession(sessionPayload, request.headers.get("user-agent"));
     setAppSession(response, sessionPayload);
   }
   return response;

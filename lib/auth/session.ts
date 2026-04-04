@@ -8,6 +8,7 @@ export const PRE_AUTH_CHALLENGE_COOKIE = "app_pre_auth";
 export type AppSession = {
   userId: string;
   email: string;
+  sessionId?: string;
   tenantId?: string;
   tenantName?: string;
   role?: TenantRole;
@@ -101,7 +102,19 @@ export async function getAppSessionFromCookies(): Promise<AppSession | null> {
   if (!raw) {
     return null;
   }
-  return decodeSession(raw);
+
+  const session = decodeSession(raw);
+  if (!session) {
+    return null;
+  }
+
+  if (!session.sessionId) {
+    return session;
+  }
+
+  const { touchActiveSession } = await import("@/lib/auth/session-registry");
+  const active = await touchActiveSession(session.userId, session.sessionId);
+  return active ? session : null;
 }
 
 export async function getPreAuthChallengeFromCookies(): Promise<PreAuthChallengeSession | null> {

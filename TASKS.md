@@ -87,7 +87,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S24 - Backup codes flow** [security]
   - User can view/generate backup codes in security screen.
 
-- [ ] **S25 - Session list + revoke** [security]
+- [x] **S25 - Session list + revoke** [security]
   - User can view active sessions and revoke selected sessions.
 
 - [ ] **S28 - Auth abuse UX** [security][auth]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S24 - Backup codes flow`
+- [x] Current active slice: `S25 - Session list + revoke`
 - [ ] Link PR/branch next to each completed slice.

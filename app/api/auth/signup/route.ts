@@ -1,5 +1,7 @@
+import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { createActiveSession } from "@/lib/auth/session-registry";
 import { clearPreAuthChallenge, setAppSession } from "@/lib/auth/session";
 import { getSupabaseEnv } from "@/lib/supabase/config";
 import { bootstrapTenantForUser } from "@/lib/tenant/bootstrap";
@@ -41,6 +43,16 @@ export async function POST(request: Request) {
   if (process.env.E2E_AUTH_BYPASS === "1") {
     const userId = `e2e-${parsed.email}`;
     const tenant = deriveTenantContextFromEmail(parsed.email, "Owner");
+    const sessionPayload = {
+      userId,
+      email: parsed.email,
+      sessionId: randomUUID(),
+      tenantId: tenant.tenantId,
+      tenantName: tenant.tenantName,
+      role: tenant.role,
+      fullName: "",
+      jobTitle: ""
+    };
     const response = NextResponse.json(
       {
         userId,
@@ -54,15 +66,8 @@ export async function POST(request: Request) {
       },
       { status: 201 }
     );
-    setAppSession(response, {
-      userId,
-      email: parsed.email,
-      tenantId: tenant.tenantId,
-      tenantName: tenant.tenantName,
-      role: tenant.role,
-      fullName: "",
-      jobTitle: ""
-    });
+    await createActiveSession(sessionPayload, request.headers.get("user-agent"));
+    setAppSession(response, sessionPayload);
     clearPreAuthChallenge(response);
     return response;
   }
@@ -147,15 +152,18 @@ export async function POST(request: Request) {
     },
     { status: 201 }
   );
-  setAppSession(response, {
+  const sessionPayload = {
     userId: data.user.id,
     email: data.user.email,
+    sessionId: randomUUID(),
     tenantId: bootstrap.tenantId,
     tenantName: bootstrap.tenantName,
     role: bootstrap.role,
     fullName: "",
     jobTitle: ""
-  });
+  };
+  await createActiveSession(sessionPayload, request.headers.get("user-agent"));
+  setAppSession(response, sessionPayload);
   clearPreAuthChallenge(response);
   return response;
 }

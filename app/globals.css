@@ -639,8 +639,42 @@ body::before {
 }
 
 .security-session-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.security-session-card-copy,
+.security-sessions-card,
+.security-sessions-summary {
   display: grid;
   gap: 0.2rem;
+}
+
+.security-sessions-card {
+  gap: 0.85rem;
+}
+
+.security-sessions-summary strong {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 1rem;
+}
+
+.security-sessions-summary .auth-subtitle {
+  margin: 0.45rem 0 0;
+}
+
+.security-sessions-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.security-session-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .security-policy-grid,
@@ -1406,6 +1440,15 @@ body::before {
 
   .security-section-header {
     flex-direction: column;
+  }
+
+  .security-session-card {
+    flex-direction: column;
+  }
+
+  .security-session-card-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .two-factor-summary {
