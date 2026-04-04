@@ -27,8 +27,9 @@ test("S38: tenant admin actions appear in audit logs", async ({ page }) => {
 
   await page.goto("/audit-logs");
   await expect(page.getByRole("heading", { name: "Audit Logs" })).toBeVisible();
+  await expect(page.getByTestId("audit-log-console")).toBeVisible();
   await expect(page.getByTestId("audit-log-list")).toBeVisible();
-  await expect(page.getByTestId("audit-log-count")).toContainText("2 events");
+  await expect(page.getByTestId("audit-log-results-summary")).toContainText("Showing 2 of 2 events");
   await expect(page.getByTestId("audit-log-list")).toContainText("Updated tenant settings for Audit Trail Workspace.");
   await expect(page.getByTestId("audit-log-list")).toContainText(`Invited ${inviteEmail} as Viewer.`);
   await expect(page.getByTestId("audit-log-list")).toContainText(adminEmail);

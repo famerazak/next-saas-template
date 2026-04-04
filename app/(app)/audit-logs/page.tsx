@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { AuditLogList } from "@/components/audit-log-list";
+import { AuditLogConsole } from "@/components/audit-log-console";
 import { NoAccessCard } from "@/components/no-access-card";
 import { loadTenantAuditEventsForSession } from "@/lib/audit/store";
 import { canAccessTenantAdminArea } from "@/lib/auth/authorization";
@@ -24,7 +24,7 @@ export default async function AuditLogsPage() {
           Recent tenant-admin and billing actions for {session.tenantName ?? "this workspace"}.
         </p>
       </section>
-      <AuditLogList events={events} />
+      <AuditLogConsole events={events} />
     </main>
   );
 }

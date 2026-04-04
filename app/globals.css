@@ -1500,6 +1500,51 @@ body::before {
   width: min(100%, 1080px);
 }
 
+.audit-log-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(180px, 1fr));
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.audit-log-toolbar label {
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.92rem;
+  color: #334155;
+}
+
+.audit-log-toolbar input,
+.audit-log-toolbar select {
+  width: 100%;
+}
+
+.audit-log-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.audit-log-export-button {
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 12px;
+  background: rgba(248, 250, 252, 0.95);
+  color: #64748b;
+  padding: 0.62rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: not-allowed;
+}
+
+.audit-log-results-summary {
+  margin: 0.9rem 0 1rem;
+  color: #64748b;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
 .audit-log-list {
   display: grid;
   gap: 0.85rem;
@@ -1945,6 +1990,14 @@ body::before {
 
   .platform-webhook-row-actions {
     justify-items: start;
+  }
+
+  .audit-log-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .audit-log-toolbar-actions {
+    justify-content: flex-start;
   }
 
   .dashboard-note-header {

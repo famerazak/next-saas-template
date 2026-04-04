@@ -119,7 +119,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S38 - Tenant audit event model wired** [app]
   - Key privileged actions produce audit entries.
 
-- [ ] **S39 - Tenant audit logs page + filters/search + non-admin denial** [ui][app]
+- [x] **S39 - Tenant audit logs page + filters/search + non-admin denial** [ui][app]
   - Owner/Admin can open `/audit-logs`, filter/search events, and Member/Viewer are denied access and export actions.
 
 - [ ] **S42 - Audit exports (CSV + JSON) with tenant boundary safety** [app]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S38 - Tenant audit event model wired`
+- [x] Current active slice: `S39 - Tenant audit logs page + filters/search + non-admin denial`
 - [ ] Link PR/branch next to each completed slice.
