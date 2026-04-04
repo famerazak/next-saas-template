@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordTenantAuditEventForSession } from "@/lib/audit/store";
 import { canTransferTenantOwnership } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies, setAppSession } from "@/lib/auth/session";
 import { transferTeamOwnershipForSession } from "@/lib/team/store";
@@ -40,6 +41,17 @@ export async function POST(request: Request) {
 
   try {
     const transferred = await transferTeamOwnershipForSession(session, targetUserId);
+    await recordTenantAuditEventForSession(session, {
+      action: "team.ownership.transferred",
+      summary: `Transferred tenant ownership to ${transferred.nextOwner.email}.`,
+      targetType: "member",
+      targetId: transferred.nextOwner.id,
+      targetLabel: transferred.nextOwner.email,
+      metadata: {
+        previousOwnerEmail: transferred.previousOwner.email,
+        nextOwnerEmail: transferred.nextOwner.email
+      }
+    });
     const response = NextResponse.json(
       {
         nextOwner: transferred.nextOwner,

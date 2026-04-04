@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordTenantAuditEventForSession } from "@/lib/audit/store";
 import { canAccessTenantAdminArea } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
 import { createInviteForSession, type InvitableRole } from "@/lib/team/invites";
@@ -68,6 +69,17 @@ export async function POST(request: Request) {
 
   try {
     const created = await createInviteForSession(session, { email, role });
+    await recordTenantAuditEventForSession(session, {
+      action: "team.invite.created",
+      summary: `Invited ${created.invite.email} as ${created.invite.role}.`,
+      targetType: "invite",
+      targetId: created.invite.id,
+      targetLabel: created.invite.email,
+      metadata: {
+        invitedEmail: created.invite.email,
+        invitedRole: created.invite.role
+      }
+    });
     return NextResponse.json(
       {
         invite: created.invite,

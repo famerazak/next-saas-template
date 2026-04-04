@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordTenantAuditEventForSession } from "@/lib/audit/store";
 import { canAccessTenantAdminArea } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
 import { removeTeamMemberForSession } from "@/lib/team/store";
@@ -40,6 +41,16 @@ export async function POST(request: Request) {
 
   try {
     const removed = await removeTeamMemberForSession(session, targetUserId);
+    await recordTenantAuditEventForSession(session, {
+      action: "team.member.removed",
+      summary: `Removed ${removed.member.email} from the tenant.`,
+      targetType: "member",
+      targetId: removed.member.id,
+      targetLabel: removed.member.email,
+      metadata: {
+        removedRole: removed.member.role
+      }
+    });
     return NextResponse.json(
       {
         member: removed.member,

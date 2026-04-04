@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordTenantAuditEventForSession } from "@/lib/audit/store";
 import { canAccessTenantAdminArea } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
 import { type EditableTeamRole, updateTeamMemberRoleForSession } from "@/lib/team/store";
@@ -62,6 +63,16 @@ export async function POST(request: Request) {
 
   try {
     const updated = await updateTeamMemberRoleForSession(session, targetUserId, role);
+    await recordTenantAuditEventForSession(session, {
+      action: "team.member.role_changed",
+      summary: `Changed ${updated.member.email} to ${updated.member.role}.`,
+      targetType: "member",
+      targetId: updated.member.id,
+      targetLabel: updated.member.email,
+      metadata: {
+        nextRole: updated.member.role
+      }
+    });
     return NextResponse.json(
       {
         member: updated.member,
