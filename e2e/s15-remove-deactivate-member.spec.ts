@@ -80,7 +80,12 @@ test("S15: owner can remove another member and the team list updates immediately
   const targetRow = page.locator('[data-testid^="team-member-row-"]').filter({ hasText: guestEmail }).first();
 
   await expect(targetRow).toBeVisible();
-  await targetRow.getByRole("button", { name: /remove/i }).click();
+  const memberId = await targetRow.getAttribute("data-testid");
+  if (!memberId) {
+    throw new Error("Missing team member row test id.");
+  }
+
+  await page.getByTestId(memberId.replace("team-member-row-", "team-member-remove-")).click();
 
   await expect(page.getByTestId("team-member-list")).not.toContainText(guestEmail);
   await expect(page.getByTestId("team-member-count")).toContainText(String(beforeCount - 1));

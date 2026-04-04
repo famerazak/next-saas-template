@@ -11,6 +11,7 @@ type TeamMembersTableProps = {
 type SaveState = {
   savingId: string | null;
   removingId: string | null;
+  transferringId: string | null;
   error: string;
   success: string;
 };
@@ -29,9 +30,12 @@ export function TeamMembersTable({ currentUserId, initialMembers }: TeamMembersT
   const [state, setState] = useState<SaveState>({
     savingId: null,
     removingId: null,
+    transferringId: null,
     error: "",
     success: ""
   });
+  const currentUser = members.find((member) => member.id === currentUserId);
+  const currentUserIsOwner = currentUser?.role === "Owner";
 
   async function updateRole(memberId: string) {
     const nextRole = draftRoles[memberId];
@@ -39,7 +43,7 @@ export function TeamMembersTable({ currentUserId, initialMembers }: TeamMembersT
       return;
     }
 
-    setState({ savingId: memberId, removingId: null, error: "", success: "" });
+    setState({ savingId: memberId, removingId: null, transferringId: null, error: "", success: "" });
 
     const response = await fetch("/api/team/member-role", {
       method: "POST",
@@ -59,6 +63,7 @@ export function TeamMembersTable({ currentUserId, initialMembers }: TeamMembersT
       setState({
         savingId: null,
         removingId: null,
+        transferringId: null,
         error: payload.error ?? "Could not update member role.",
         success: ""
       });
@@ -78,6 +83,7 @@ export function TeamMembersTable({ currentUserId, initialMembers }: TeamMembersT
     setState({
       savingId: null,
       removingId: null,
+      transferringId: null,
       error: "",
       success: `${updatedMember.email} is now ${updatedMember.role}.`
     });
@@ -89,7 +95,7 @@ export function TeamMembersTable({ currentUserId, initialMembers }: TeamMembersT
       return;
     }
 
-    setState({ savingId: null, removingId: memberId, error: "", success: "" });
+    setState({ savingId: null, removingId: memberId, transferringId: null, error: "", success: "" });
 
     const response = await fetch("/api/team/member-remove", {
       method: "POST",
@@ -108,6 +114,7 @@ export function TeamMembersTable({ currentUserId, initialMembers }: TeamMembersT
       setState({
         savingId: null,
         removingId: null,
+        transferringId: null,
         error: payload.error ?? "Could not remove team member.",
         success: ""
       });
@@ -117,6 +124,7 @@ export function TeamMembersTable({ currentUserId, initialMembers }: TeamMembersT
     setState({
       savingId: null,
       removingId: null,
+      transferringId: null,
       error: "",
       success: `${targetMember.email} was removed from the tenant.`
     });
@@ -125,6 +133,64 @@ export function TeamMembersTable({ currentUserId, initialMembers }: TeamMembersT
       const next = { ...current };
       delete next[memberId];
       return next;
+    });
+  }
+
+  async function transferOwnership(memberId: string) {
+    const targetMember = members.find((member) => member.id === memberId);
+    if (!targetMember) {
+      return;
+    }
+
+    setState({ savingId: null, removingId: null, transferringId: memberId, error: "", success: "" });
+
+    const response = await fetch("/api/team/ownership-transfer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        targetUserId: memberId
+      })
+    });
+
+    const payload = (await response.json().catch(() => ({}))) as {
+      error?: string;
+      nextOwner?: TeamMember;
+      previousOwner?: TeamMember;
+    };
+
+    if (!response.ok || !payload.nextOwner || !payload.previousOwner) {
+      setState({
+        savingId: null,
+        removingId: null,
+        transferringId: null,
+        error: payload.error ?? "Could not transfer ownership.",
+        success: ""
+      });
+      return;
+    }
+
+    const nextOwner = payload.nextOwner;
+    const previousOwner = payload.previousOwner;
+
+    setMembers((current) =>
+      current.map((member) => {
+        if (member.id === nextOwner.id) return nextOwner;
+        if (member.id === previousOwner.id) return previousOwner;
+        return member;
+      })
+    );
+    setDraftRoles((current) => {
+      const next = { ...current };
+      delete next[nextOwner.id];
+      next[previousOwner.id] = "Admin";
+      return next;
+    });
+    setState({
+      savingId: null,
+      removingId: null,
+      transferringId: null,
+      error: "",
+      success: `${targetMember.email} is now the tenant owner.`
     });
   }
 
@@ -161,20 +227,38 @@ export function TeamMembersTable({ currentUserId, initialMembers }: TeamMembersT
         </div>
         {members.map((member) => {
           const isCurrentUser = member.id === currentUserId;
-          const canEditRole = !isCurrentUser && member.role !== "Owner";
-          const canRemoveMember = !isCurrentUser && member.role !== "Owner";
+          const isOwner = member.role === "Owner";
+          const canTransferOwnership =
+            currentUserIsOwner && !isCurrentUser && !isOwner && member.role !== "Viewer";
+          const canEditRole = !isCurrentUser && !isOwner;
+          const canRemoveMember = !isCurrentUser && !isOwner;
           const selectedRole = draftRoles[member.id] ?? "Member";
           const roleChanged = canEditRole && selectedRole !== member.role;
-          const isBusy = state.savingId === member.id || state.removingId === member.id;
+          const isBusy =
+            state.savingId === member.id ||
+            state.removingId === member.id ||
+            state.transferringId === member.id;
 
           return (
             <div
-              className="team-members-table-row"
+              className={`team-members-table-row${isOwner ? " team-members-table-row--owner" : ""}${
+                isCurrentUser ? " team-members-table-row--current-user" : ""
+              }`}
               key={member.id}
               data-testid={`team-member-row-${member.id}`}
             >
               <div className="team-member-primary">
-                <span>{member.fullName || "Unknown"}</span>
+                <div className="team-member-primary-line">
+                  <span>{member.fullName || "Unknown"}</span>
+                  {isOwner ? (
+                    <span
+                      className="team-member-badge team-member-badge--owner"
+                      data-testid={`team-member-owner-badge-${member.id}`}
+                    >
+                      Owner
+                    </span>
+                  ) : null}
+                </div>
                 {isCurrentUser ? <span className="team-member-note">Current user</span> : null}
               </div>
               <span className="team-members-email">{member.email}</span>
@@ -226,6 +310,18 @@ export function TeamMembersTable({ currentUserId, initialMembers }: TeamMembersT
                         onClick={() => removeMember(member.id)}
                       >
                         {state.removingId === member.id ? "Removing..." : "Remove"}
+                      </button>
+                    ) : null}
+                    {canTransferOwnership ? (
+                      <button
+                        type="button"
+                        className="team-member-transfer"
+                        aria-label={`Transfer ownership to ${member.email}`}
+                        data-testid={`team-member-transfer-${member.id}`}
+                        disabled={isBusy}
+                        onClick={() => transferOwnership(member.id)}
+                      >
+                        {state.transferringId === member.id ? "Transferring..." : "Transfer ownership"}
                       </button>
                     ) : null}
                   </div>

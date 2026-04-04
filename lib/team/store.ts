@@ -19,13 +19,17 @@ type MembershipRow = {
 
 type LocalTeamMember = TeamMember & {
   tenantId: string;
+  tenantName?: string;
 };
 
 type LocalTeamStore = Map<string, TeamMember[]>;
+type LocalTenantNameStore = Map<string, string>;
 
 declare global {
   // eslint-disable-next-line no-var
   var __localTeamStore: LocalTeamStore | undefined;
+  // eslint-disable-next-line no-var
+  var __localTenantNameStore: LocalTenantNameStore | undefined;
 }
 
 function getLocalTeamStore(): LocalTeamStore {
@@ -33,6 +37,17 @@ function getLocalTeamStore(): LocalTeamStore {
     globalThis.__localTeamStore = new Map<string, TeamMember[]>();
   }
   return globalThis.__localTeamStore;
+}
+
+function getLocalTenantNameStore(): LocalTenantNameStore {
+  if (!globalThis.__localTenantNameStore) {
+    globalThis.__localTenantNameStore = new Map<string, string>();
+  }
+  return globalThis.__localTenantNameStore;
+}
+
+function normalizeEmail(value: string): string {
+  return value.trim().toLowerCase();
 }
 
 function getServiceClient() {
@@ -87,6 +102,7 @@ function fallbackMemberFromSession(session: AppSession): TeamMember[] {
 
 export function saveLocalTeamMember(member: LocalTeamMember): TeamMember[] {
   const store = getLocalTeamStore();
+  const tenantNames = getLocalTenantNameStore();
   const existing = store.get(member.tenantId) ?? [];
   const next = [
     {
@@ -99,7 +115,33 @@ export function saveLocalTeamMember(member: LocalTeamMember): TeamMember[] {
     ...existing.filter((entry) => entry.id !== member.id)
   ];
   store.set(member.tenantId, next);
+  if (member.tenantName) {
+    tenantNames.set(member.tenantId, member.tenantName);
+  }
   return next;
+}
+
+export function resolveLocalTenantContextForEmail(
+  email: string
+): { tenantId: string; tenantName: string; role: TenantRole } | null {
+  const normalizedEmail = normalizeEmail(email);
+  const store = getLocalTeamStore();
+  const tenantNames = getLocalTenantNameStore();
+
+  for (const [tenantId, members] of store.entries()) {
+    const match = members.find((member) => normalizeEmail(member.email) === normalizedEmail);
+    if (!match) {
+      continue;
+    }
+
+    return {
+      tenantId,
+      tenantName: tenantNames.get(tenantId) ?? "Workspace",
+      role: match.role
+    };
+  }
+
+  return null;
 }
 
 function loadFromLocalStore(session: AppSession): TeamMember[] {
@@ -109,6 +151,7 @@ function loadFromLocalStore(session: AppSession): TeamMember[] {
 
   return saveLocalTeamMember({
     tenantId: session.tenantId,
+    tenantName: session.tenantName,
     id: session.userId,
     email: session.email,
     fullName: session.fullName || "Current user",
@@ -330,6 +373,132 @@ export async function removeTeamMemberForSession(
 
   return {
     member: target,
+    persistedToDatabase: true
+  };
+}
+
+function transferOwnershipInLocalStore(
+  session: AppSession,
+  targetUserId: string
+): { nextOwner: TeamMember; previousOwner: TeamMember } {
+  if (!session.tenantId) {
+    throw new Error("Tenant context is required.");
+  }
+
+  if ((session.role ?? "Member") !== "Owner") {
+    throw new Error("Only the current owner can transfer ownership.");
+  }
+
+  const store = getLocalTeamStore();
+  const members = loadFromLocalStore(session);
+  const target = members.find((member) => member.id === targetUserId);
+  const currentOwner = members.find((member) => member.id === session.userId);
+
+  if (!target || !currentOwner) {
+    throw new Error("Team member not found.");
+  }
+
+  if (target.id === session.userId) {
+    throw new Error("Choose another eligible member.");
+  }
+
+  if (target.role === "Owner") {
+    throw new Error("That member is already the owner.");
+  }
+
+  if (target.role === "Viewer") {
+    throw new Error("Viewer cannot receive ownership directly.");
+  }
+
+  const nextOwner = { ...target, role: "Owner" as const };
+  const previousOwner = { ...currentOwner, role: "Admin" as const };
+
+  store.set(
+    session.tenantId,
+    members.map((member) => {
+      if (member.id === nextOwner.id) return nextOwner;
+      if (member.id === previousOwner.id) return previousOwner;
+      return member;
+    })
+  );
+
+  return { nextOwner, previousOwner };
+}
+
+export async function transferTeamOwnershipForSession(
+  session: AppSession,
+  targetUserId: string
+): Promise<{
+  nextOwner: TeamMember;
+  previousOwner: TeamMember;
+  persistedToDatabase: boolean;
+}> {
+  if (!session.tenantId) {
+    throw new Error("Tenant context is required.");
+  }
+
+  if ((session.role ?? "Member") !== "Owner") {
+    throw new Error("Only the current owner can transfer ownership.");
+  }
+
+  const supabase = getServiceClient();
+  if (!supabase || process.env.E2E_AUTH_BYPASS === "1") {
+    const local = transferOwnershipInLocalStore(session, targetUserId);
+    return {
+      ...local,
+      persistedToDatabase: false
+    };
+  }
+
+  const members = await loadTeamMembersForSession(session);
+  const target = members.find((member) => member.id === targetUserId);
+  const currentOwner = members.find((member) => member.id === session.userId);
+
+  if (!target || !currentOwner) {
+    throw new Error("Team member not found.");
+  }
+
+  if (target.id === session.userId) {
+    throw new Error("Choose another eligible member.");
+  }
+
+  if (target.role === "Owner") {
+    throw new Error("That member is already the owner.");
+  }
+
+  if (target.role === "Viewer") {
+    throw new Error("Viewer cannot receive ownership directly.");
+  }
+
+  const { error: targetError } = await supabase
+    .from("memberships")
+    .update({ role: "owner" })
+    .eq("tenant_id", session.tenantId)
+    .eq("user_id", targetUserId);
+
+  if (targetError) {
+    throw new Error(targetError.message);
+  }
+
+  const { error: currentOwnerError } = await supabase
+    .from("memberships")
+    .update({ role: "admin" })
+    .eq("tenant_id", session.tenantId)
+    .eq("user_id", session.userId);
+
+  if (currentOwnerError) {
+    throw new Error(currentOwnerError.message);
+  }
+
+  return {
+    nextOwner: {
+      ...target,
+      role: "Owner"
+    },
+    previousOwner: {
+      ...currentOwner,
+      role: "Admin"
+    },
     persistedToDatabase: true
   };
 }

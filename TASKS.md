@@ -62,7 +62,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S15 - Remove/deactivate member**
   - Owner/Admin can remove member from tenant and the team list reflects the change immediately.
 
-- [ ] **S16 - Ownership transfer** [rbac][auth]
+- [x] **S16 - Ownership transfer** [rbac][auth]
   - Owner can transfer ownership to another eligible member.
 
 - [ ] **S17 - Roles & permissions matrix page** [rbac][ui]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [ ] Set current active slice here before coding.
+- [x] Current active slice: `S16 - Ownership transfer`
 - [ ] Link PR/branch next to each completed slice.
