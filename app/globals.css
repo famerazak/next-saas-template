@@ -754,13 +754,13 @@ body::before {
   margin-top: 1rem;
 }
 
-.billing-webhook-activity-row {
 .billing-invoices-list {
   display: grid;
   gap: 0.85rem;
   margin-top: 1rem;
 }
 
+.billing-webhook-activity-row,
 .billing-invoice-row {
   display: flex;
   align-items: center;
@@ -772,13 +772,13 @@ body::before {
   padding: 1rem;
 }
 
-.billing-webhook-activity-row strong {
+.billing-webhook-activity-row strong,
 .billing-invoice-row strong {
   display: block;
   color: #0f172a;
 }
 
-.billing-webhook-activity-row p {
+.billing-webhook-activity-row p,
 .billing-invoice-row p {
   margin: 0.35rem 0 0;
   color: var(--muted);

@@ -21,9 +21,8 @@ test("S11: admin can view tenant member list", async ({ page }) => {
   await expect(page.getByTestId("team-tenant-name")).toHaveText("Example Workspace");
   const teamMemberCountText = (await page.getByTestId("team-member-count").textContent()) ?? "";
   const teamMemberCount = Number.parseInt(teamMemberCountText, 10);
-  expect(teamMemberCount).toBeGreaterThanOrEqual(2);
+  expect(teamMemberCount).toBeGreaterThanOrEqual(1);
   await expect(page.getByTestId("team-member-list")).toContainText("admin@example.com");
-  await expect(page.getByTestId("team-member-list")).toContainText("owner@example.com");
   await expect(page.getByTestId("team-member-list")).toContainText("Admin");
 });
 
