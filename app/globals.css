@@ -144,6 +144,13 @@ body::before {
   box-shadow: 0 12px 24px rgba(37, 99, 235, 0.24);
 }
 
+.auth-form .auth-secondary-button {
+  background: rgba(241, 245, 249, 0.95);
+  color: #334155;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  box-shadow: none;
+}
+
 .auth-form button:disabled,
 .accept-invite-button:disabled {
   opacity: 0.7;

@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { clearAppSession, clearPreAuthChallenge } from "@/lib/auth/session";
+import { clearPreAuthChallenge } from "@/lib/auth/session";
 import { buildRedirectUrl } from "@/lib/http/redirect";
 
 export async function POST(request: Request) {
   const response = NextResponse.redirect(buildRedirectUrl(request, "/login"), { status: 303 });
-  clearAppSession(response);
   clearPreAuthChallenge(response);
   return response;
 }

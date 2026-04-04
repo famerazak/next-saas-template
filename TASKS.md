@@ -81,7 +81,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S22 - User can enroll in 2FA** [security][auth]
   - User can start setup, scan TOTP QR, and complete enrollment.
 
-- [ ] **S23 - User can complete 2FA challenge on login** [security][auth]
+- [x] **S23 - User can complete 2FA challenge on login** [security][auth]
   - If enrolled, login requires 2FA challenge step.
 
 - [ ] **S24 - Backup codes flow** [security]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S22 - User can enroll in 2FA`
+- [x] Current active slice: `S23 - User can complete 2FA challenge on login`
 - [ ] Link PR/branch next to each completed slice.

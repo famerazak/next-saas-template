@@ -30,10 +30,15 @@ export function AppShell({
 }: AppShellProps) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     setDrawerOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   return (
     <div className="app-frame">
@@ -46,6 +51,7 @@ export function AppShell({
             aria-expanded={drawerOpen}
             aria-controls="app-sidebar"
             data-testid="app-shell-menu-toggle"
+            disabled={!hydrated}
           >
             <span />
             <span />

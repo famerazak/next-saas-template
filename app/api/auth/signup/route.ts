@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { setAppSession } from "@/lib/auth/session";
+import { clearPreAuthChallenge, setAppSession } from "@/lib/auth/session";
 import { getSupabaseEnv } from "@/lib/supabase/config";
 import { bootstrapTenantForUser } from "@/lib/tenant/bootstrap";
 import { deriveTenantContextFromEmail } from "@/lib/tenant/context";
@@ -63,6 +63,7 @@ export async function POST(request: Request) {
       fullName: "",
       jobTitle: ""
     });
+    clearPreAuthChallenge(response);
     return response;
   }
 
@@ -155,5 +156,6 @@ export async function POST(request: Request) {
     fullName: "",
     jobTitle: ""
   });
+  clearPreAuthChallenge(response);
   return response;
 }

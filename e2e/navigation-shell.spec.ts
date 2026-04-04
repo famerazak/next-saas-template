@@ -36,6 +36,7 @@ test.describe("App shell mobile drawer", () => {
     await page.getByRole("button", { name: "Log in" }).click();
 
     await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+    await expect(page.getByTestId("app-shell-menu-toggle")).toBeEnabled();
     await expect(page.getByTestId("app-sidebar")).toHaveAttribute("data-state", "closed");
     await page.getByTestId("app-shell-menu-toggle").click();
     await expect(page.getByTestId("app-sidebar")).toHaveAttribute("data-state", "open");

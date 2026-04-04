@@ -49,6 +49,10 @@ function getLocalTwoFactorStore(): LocalTwoFactorStore {
 }
 
 function getServiceClient() {
+  if (process.env.E2E_AUTH_BYPASS === "1") {
+    return null;
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !serviceRoleKey) {
@@ -152,6 +156,11 @@ export async function loadTwoFactorStateForUser(userId: string, email: string): 
     pendingSecret: data.pending_secret,
     pendingStartedAt: data.pending_started_at
   });
+}
+
+export async function isTwoFactorEnabledForUser(userId: string, email: string): Promise<boolean> {
+  const state = await loadTwoFactorStateForUser(userId, email);
+  return state.isEnabled;
 }
 
 export async function startTwoFactorEnrollmentForUser(userId: string, email: string): Promise<TwoFactorState> {
@@ -260,4 +269,37 @@ export async function completeTwoFactorEnrollmentForUser(
     pendingSecret: null,
     pendingStartedAt: null
   });
+}
+
+export async function verifyTwoFactorChallengeForUser(
+  userId: string,
+  email: string,
+  token: string
+): Promise<TwoFactorState> {
+  const currentState = await loadTwoFactorStateForUser(userId, email);
+  const supabase = getServiceClient();
+  let secret: string | null = null;
+
+  if (supabase) {
+    const { data } = await supabase
+      .from("user_two_factor_factors")
+      .select("totp_secret")
+      .eq("user_id", userId)
+      .maybeSingle<{ totp_secret: string | null }>();
+    secret = data?.totp_secret ?? null;
+  }
+
+  if (!supabase) {
+    secret = readLocalRecord(userId, email).enabledSecret;
+  }
+
+  if (!currentState.isEnabled || !secret) {
+    throw new Error("No enrolled 2FA factor exists for this account.");
+  }
+
+  if (!verifyTotpToken({ secret, token })) {
+    throw new Error("Verification code is invalid. Try the latest code from your authenticator app.");
+  }
+
+  return currentState;
 }

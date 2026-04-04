@@ -1,7 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { setAppSession } from "@/lib/auth/session";
+import { clearAppSession, clearPreAuthChallenge, setAppSession, setPreAuthChallenge } from "@/lib/auth/session";
 import { loadProfileForUser } from "@/lib/profile/store";
+import { isTwoFactorEnabledForUser } from "@/lib/security/two-factor";
 import { getSupabaseEnv } from "@/lib/supabase/config";
 import { resolveLocalTenantContextForEmail } from "@/lib/team/store";
 import {
@@ -38,26 +39,39 @@ export async function POST(request: Request) {
   }
 
   if (process.env.E2E_AUTH_BYPASS === "1") {
+    const requiresTwoFactor = await isTwoFactorEnabledForUser(`e2e-${parsed.email}`, parsed.email);
     const tenant =
       resolveLocalTenantContextForEmail(parsed.email) ??
       deriveTenantContextFromEmail(parsed.email, inferTenantRoleFromEmail(parsed.email));
     const response = NextResponse.json(
       {
         userId: `e2e-${parsed.email}`,
-        redirectTo: "/dashboard",
+        redirectTo: requiresTwoFactor ? "/login" : "/dashboard",
+        requiresTwoFactor,
+        email: parsed.email,
         tenantId: tenant.tenantId,
         tenantName: tenant.tenantName,
         role: tenant.role
       },
       { status: 200 }
     );
-    setAppSession(response, {
+    const sessionPayload = {
       userId: `e2e-${parsed.email}`,
       email: parsed.email,
       tenantId: tenant.tenantId,
       tenantName: tenant.tenantName,
       role: tenant.role
-    });
+    };
+    if (requiresTwoFactor) {
+      clearAppSession(response);
+      setPreAuthChallenge(response, {
+        ...sessionPayload,
+        passwordVerifiedAt: new Date().toISOString()
+      });
+    } else {
+      clearPreAuthChallenge(response);
+      setAppSession(response, sessionPayload);
+    }
     return response;
   }
 
@@ -115,11 +129,14 @@ export async function POST(request: Request) {
   }
 
   const profile = await loadProfileForUser(data.user.id);
+  const requiresTwoFactor = await isTwoFactorEnabledForUser(data.user.id, data.user.email);
 
   const response = NextResponse.json(
     {
       userId: data.user.id,
-      redirectTo: "/dashboard",
+      redirectTo: requiresTwoFactor ? "/login" : "/dashboard",
+      requiresTwoFactor,
+      email: data.user.email,
       tenantId: tenant.tenantId,
       tenantName: tenant.tenantName,
       role: tenant.role,
@@ -128,7 +145,7 @@ export async function POST(request: Request) {
     },
     { status: 200 }
   );
-  setAppSession(response, {
+  const sessionPayload = {
     userId: data.user.id,
     email: data.user.email,
     tenantId: tenant.tenantId,
@@ -136,6 +153,16 @@ export async function POST(request: Request) {
     role: tenant.role,
     fullName: profile?.fullName ?? "",
     jobTitle: profile?.jobTitle ?? ""
-  });
+  };
+  if (requiresTwoFactor) {
+    clearAppSession(response);
+    setPreAuthChallenge(response, {
+      ...sessionPayload,
+      passwordVerifiedAt: new Date().toISOString()
+    });
+  } else {
+    clearPreAuthChallenge(response);
+    setAppSession(response, sessionPayload);
+  }
   return response;
 }
