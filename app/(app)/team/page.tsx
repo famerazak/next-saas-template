@@ -36,7 +36,7 @@ export default async function TeamPage() {
           </div>
           <div>
             <span className="settings-label">Members</span>
-            <strong data-testid="team-member-count">{members.length}</strong>
+            <strong>{members.length}</strong>
           </div>
         </div>
         <TeamInviteForm tenantName={tenantName} initialPendingInvites={pendingInvites} />

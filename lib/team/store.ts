@@ -257,3 +257,79 @@ export async function updateTeamMemberRoleForSession(
     persistedToDatabase: true
   };
 }
+
+function removeMemberFromLocalStore(session: AppSession, targetUserId: string): TeamMember {
+  if (!session.tenantId) {
+    throw new Error("Tenant context is required.");
+  }
+
+  const store = getLocalTeamStore();
+  const members = loadFromLocalStore(session);
+  const target = members.find((member) => member.id === targetUserId);
+
+  if (!target) {
+    throw new Error("Team member not found.");
+  }
+
+  if (target.id === session.userId) {
+    throw new Error("You cannot remove yourself from this screen.");
+  }
+
+  if (target.role === "Owner") {
+    throw new Error("Owner removal must use the ownership transfer flow.");
+  }
+
+  store.set(
+    session.tenantId,
+    members.filter((member) => member.id !== targetUserId)
+  );
+
+  return target;
+}
+
+export async function removeTeamMemberForSession(
+  session: AppSession,
+  targetUserId: string
+): Promise<{ member: TeamMember; persistedToDatabase: boolean }> {
+  if (!session.tenantId) {
+    throw new Error("Tenant context is required.");
+  }
+
+  const supabase = getServiceClient();
+  if (!supabase || process.env.E2E_AUTH_BYPASS === "1") {
+    return {
+      member: removeMemberFromLocalStore(session, targetUserId),
+      persistedToDatabase: false
+    };
+  }
+
+  const members = await loadTeamMembersForSession(session);
+  const target = members.find((member) => member.id === targetUserId);
+
+  if (!target) {
+    throw new Error("Team member not found.");
+  }
+
+  if (target.id === session.userId) {
+    throw new Error("You cannot remove yourself from this screen.");
+  }
+
+  if (target.role === "Owner") {
+    throw new Error("Owner removal must use the ownership transfer flow.");
+  }
+
+  const { error } = await supabase
+    .from("memberships")
+    .delete()
+    .eq("tenant_id", session.tenantId)
+    .eq("user_id", targetUserId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    member: target,
+    persistedToDatabase: true
+  };
+}
