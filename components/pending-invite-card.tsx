@@ -1,44 +1,11 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import type { PendingInvite } from "@/lib/team/invites";
 
 type PendingInviteCardProps = {
   initialInvites: PendingInvite[];
+  error?: string;
 };
 
-export function PendingInviteCard({ initialInvites }: PendingInviteCardProps) {
-  const router = useRouter();
-  const [invites, setInvites] = useState(initialInvites);
-  const [submittingId, setSubmittingId] = useState<string | null>(null);
-  const [error, setError] = useState("");
-
-  async function acceptInvite(inviteId: string) {
-    setSubmittingId(inviteId);
-    setError("");
-
-    const response = await fetch("/api/team/invite/accept", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ inviteId })
-    });
-
-    const payload = (await response.json().catch(() => ({}))) as {
-      error?: string;
-    };
-
-    if (!response.ok) {
-      setSubmittingId(null);
-      setError(payload.error ?? "Could not accept invite.");
-      return;
-    }
-
-    setInvites((current) => current.filter((invite) => invite.id !== inviteId));
-    setSubmittingId(null);
-    router.refresh();
-  }
-
+export function PendingInviteCard({ initialInvites, error = "" }: PendingInviteCardProps) {
   return (
     <section className="dashboard-invites-card" data-testid="pending-invites-card">
       <div className="settings-header">
@@ -53,7 +20,7 @@ export function PendingInviteCard({ initialInvites }: PendingInviteCardProps) {
         </p>
       ) : null}
       <div className="team-invite-list" data-testid="pending-invites-list">
-        {invites.map((invite) => (
+        {initialInvites.map((invite) => (
           <div className="team-invite-row" key={invite.id} data-testid={`pending-invite-${invite.id}`}>
             <div className="team-invite-copy">
               <strong>{invite.tenantName}</strong>
@@ -61,14 +28,12 @@ export function PendingInviteCard({ initialInvites }: PendingInviteCardProps) {
                 {invite.role} access for {invite.email}
               </span>
             </div>
-            <button
-              type="button"
-              className="accept-invite-button"
-              disabled={submittingId === invite.id}
-              onClick={() => acceptInvite(invite.id)}
-            >
-              {submittingId === invite.id ? "Accepting..." : "Accept invite"}
-            </button>
+            <form method="post" action="/api/team/invite/accept">
+              <input type="hidden" name="inviteId" value={invite.id} />
+              <button type="submit" className="accept-invite-button">
+                Accept invite
+              </button>
+            </form>
           </div>
         ))}
       </div>

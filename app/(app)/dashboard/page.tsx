@@ -6,12 +6,19 @@ import { getAppSessionFromCookies } from "@/lib/auth/session";
 import { loadPendingInvitesForEmail } from "@/lib/team/invites";
 import { loadTenantSettingsForSession } from "@/lib/tenant/settings";
 
-export default async function DashboardPage() {
+type DashboardPageProps = {
+  searchParams?: Promise<{
+    inviteError?: string;
+  }>;
+};
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const session = await getAppSessionFromCookies();
   if (!session) {
     redirect("/login");
   }
 
+  const params = (await searchParams) ?? {};
   const tenantName = session.tenantName ?? "Unknown workspace";
   const role = session.role ?? "Member";
   const email = session.email;
@@ -33,7 +40,9 @@ export default async function DashboardPage() {
           initialNote={tenantSettings.dashboardNote}
           canWrite={canWriteCoreApp(session)}
         />
-        {pendingInvites.length > 0 ? <PendingInviteCard initialInvites={pendingInvites} /> : null}
+        {pendingInvites.length > 0 ? (
+          <PendingInviteCard initialInvites={pendingInvites} error={params.inviteError ?? ""} />
+        ) : null}
       </section>
     </main>
   );
