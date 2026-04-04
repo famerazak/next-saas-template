@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
+import { formatAuthAbuseMessage } from "@/lib/auth/abuse";
 
 type LoginStep = "password" | "two-factor";
 
@@ -62,7 +63,7 @@ export function LoginForm({
       setState((current) => ({
         ...current,
         loading: false,
-        error: payload.error ?? "Unable to log in. Please try again."
+        error: formatAuthAbuseMessage(payload, "Unable to log in. Please try again.")
       }));
       return;
     }

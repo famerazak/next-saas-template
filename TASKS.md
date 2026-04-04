@@ -90,7 +90,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S25 - Session list + revoke** [security]
   - User can view active sessions and revoke selected sessions.
 
-- [ ] **S28 - Auth abuse UX** [security][auth]
+- [x] **S28 - Auth abuse UX** [security][auth]
   - Rate-limit/captcha failures show clear user-facing error messages.
 
 ---
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S25 - Session list + revoke`
+- [x] Current active slice: `S28 - Auth abuse UX`
 - [ ] Link PR/branch next to each completed slice.

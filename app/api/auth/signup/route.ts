@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { normalizeProviderAuthAbuse } from "@/lib/auth/abuse";
 import { createActiveSession } from "@/lib/auth/session-registry";
 import { clearPreAuthChallenge, setAppSession } from "@/lib/auth/session";
 import { getSupabaseEnv } from "@/lib/supabase/config";
@@ -99,6 +100,16 @@ export async function POST(request: Request) {
   });
 
   if (error) {
+    const normalized = normalizeProviderAuthAbuse(error);
+    if (normalized) {
+      return NextResponse.json(normalized, {
+        status: normalized.code === "captcha_required" ? 403 : 429,
+        headers: normalized.retryAfterSeconds
+          ? { "Retry-After": String(normalized.retryAfterSeconds) }
+          : undefined
+      });
+    }
+
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
