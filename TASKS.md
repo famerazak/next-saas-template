@@ -97,7 +97,7 @@ Each slice should ship something real a user can see/use.
 
 ## Slice 29-37: Billing + Stripe + Reliability
 
-- [ ] **S29 - Owner billing access + checkout start** [billing]
+- [x] **S29 - Owner billing access + checkout start** [billing]
   - Owner can access `/billing`, others cannot, and owner can start plan/seat checkout from the billing UI.
 
 - [ ] **S31 - Add/update card details** [billing]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S28 - Auth abuse UX`
+- [x] Current active slice: `S29 - Owner billing access + checkout start`
 - [ ] Link PR/branch next to each completed slice.

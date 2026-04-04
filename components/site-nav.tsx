@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { canAccessTenantAdminArea } from "@/lib/auth/authorization";
+import { canAccessTenantAdminArea, canManageTenantBilling } from "@/lib/auth/authorization";
 import type { AppSession } from "@/lib/auth/session";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
 
@@ -63,16 +63,19 @@ export function buildSidebarLinks(session: AppSession): AppNavLink[] {
         testId: "sidebar-link-roles-permissions"
       },
       {
-        href: "/billing",
-        label: "Billing",
-        testId: "sidebar-link-billing"
-      },
-      {
         href: "/audit-logs",
         label: "Audit Logs",
         testId: "sidebar-link-audit-logs"
       }
     );
+  }
+
+  if (canManageTenantBilling(session)) {
+    links.push({
+      href: "/billing",
+      label: "Billing",
+      testId: "sidebar-link-billing"
+    });
   }
 
   return links;
