@@ -316,6 +316,14 @@ body::before {
   font-size: 0.93rem;
 }
 
+.team-members-table-row--owner {
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.92), rgba(255, 255, 255, 0.86));
+}
+
+.team-members-table-row--current-user {
+  box-shadow: inset 4px 0 0 rgba(37, 99, 235, 0.16);
+}
+
 .team-members-name {
   font-weight: 600;
 }
@@ -325,9 +333,37 @@ body::before {
   gap: 0.2rem;
 }
 
+.team-member-primary-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .team-member-note {
   color: #64748b;
   font-size: 0.8rem;
+}
+
+.team-member-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 0.16rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.team-member-badge--owner {
+  border-color: rgba(180, 83, 9, 0.18);
+  background: rgba(255, 247, 237, 0.96);
+  color: #9a3412;
 }
 
 .team-members-email,
@@ -400,6 +436,28 @@ body::before {
   opacity: 0.65;
   cursor: not-allowed;
   transform: none;
+}
+
+.team-member-transfer {
+  border: 1px solid rgba(180, 83, 9, 0.18);
+  background: rgba(255, 247, 237, 0.96);
+  color: #9a3412;
+  padding: 0.58rem 0.82rem;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease;
+}
+
+.team-member-transfer:hover,
+.team-member-transfer:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(180, 83, 9, 0.34);
+  background: rgba(254, 243, 199, 0.96);
 }
 
 .team-role-static {
@@ -825,7 +883,8 @@ body::before {
   }
 
   .team-role-control select,
-  .team-role-save {
+  .team-role-save,
+  .team-member-transfer {
     width: 100%;
   }
 }

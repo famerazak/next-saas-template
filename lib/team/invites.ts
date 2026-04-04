@@ -321,6 +321,7 @@ export async function acceptInviteForSession(
     removeInviteFromMemory(invite.id);
     saveLocalTeamMember({
       tenantId: invite.tenantId,
+      tenantName: invite.tenantName,
       id: session.userId,
       email: session.email,
       fullName: session.fullName || "Current user",

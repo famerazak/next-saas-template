@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { setAppSession } from "@/lib/auth/session";
 import { loadProfileForUser } from "@/lib/profile/store";
 import { getSupabaseEnv } from "@/lib/supabase/config";
+import { resolveLocalTenantContextForEmail } from "@/lib/team/store";
 import {
   deriveTenantContextFromEmail,
   inferTenantRoleFromEmail,
@@ -37,7 +38,9 @@ export async function POST(request: Request) {
   }
 
   if (process.env.E2E_AUTH_BYPASS === "1") {
-    const tenant = deriveTenantContextFromEmail(parsed.email, inferTenantRoleFromEmail(parsed.email));
+    const tenant =
+      resolveLocalTenantContextForEmail(parsed.email) ??
+      deriveTenantContextFromEmail(parsed.email, inferTenantRoleFromEmail(parsed.email));
     const response = NextResponse.json(
       {
         userId: `e2e-${parsed.email}`,
