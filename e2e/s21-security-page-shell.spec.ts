@@ -16,7 +16,7 @@ test("S21: unauthenticated user is redirected from security to login", async ({ 
 });
 
 test("S21: signed-in user can open security page and see personal event history", async ({ page }) => {
-  await login(page, "member@example.com");
+  await login(page, "security-member@example.com");
 
   await expect(page.getByTestId("sidebar-link-security")).toBeVisible();
   await page.getByTestId("sidebar-link-security").click();
@@ -24,13 +24,14 @@ test("S21: signed-in user can open security page and see personal event history"
   await expect(page).toHaveURL(/\/security$/);
   await expect(page.getByTestId("security-page")).toBeVisible();
   await expect(page.getByTestId("security-2fa-section")).toContainText("Not enrolled");
-  await expect(page.getByTestId("security-sessions-section")).toContainText("Coming in S25");
+  await expect(page.getByTestId("security-sessions-section")).toContainText("Active now");
+  await expect(page.getByTestId("security-session-count")).toContainText("1 active session");
   await expect(page.getByTestId("security-events-section")).toContainText("Current session active");
   await expect(page.getByTestId("security-events-section")).toContainText("2FA enrollment pending");
 });
 
 test("S21: admin sees tenant policy placeholder with admin preview state", async ({ page }) => {
-  await login(page, "admin@example.com");
+  await login(page, "security-admin@example.com");
   await page.goto("/security");
 
   await expect(page.getByTestId("security-policy-section")).toContainText("Admin preview");

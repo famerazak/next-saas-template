@@ -1,11 +1,15 @@
 import type { AppSession } from "@/lib/auth/session";
+import type { SessionRecord } from "@/lib/auth/session-registry";
 import type { TwoFactorState } from "@/lib/security/two-factor";
 import { BackupCodesCard } from "@/components/backup-codes-card";
+import { SecuritySessionsCard } from "@/components/security-sessions-card";
 import { TwoFactorEnrollmentCard } from "@/components/two-factor-enrollment-card";
 
 type SecurityPageShellProps = {
   session: AppSession;
   twoFactorState: TwoFactorState;
+  sessions: SessionRecord[];
+  currentSessionId: string | null;
 };
 
 type SecurityEvent = {
@@ -14,7 +18,7 @@ type SecurityEvent = {
   tone: "neutral" | "good" | "attention";
 };
 
-function buildSecurityEvents(session: AppSession, twoFactorState: TwoFactorState): SecurityEvent[] {
+function buildSecurityEvents(session: AppSession, twoFactorState: TwoFactorState, sessions: SessionRecord[]): SecurityEvent[] {
   const role = session.role ?? "Member";
   const tenantName = session.tenantName ?? "Workspace";
 
@@ -50,9 +54,12 @@ function buildSecurityEvents(session: AppSession, twoFactorState: TwoFactorState
           tone: "neutral"
         },
     {
-      title: "Session controls staged",
-      detail: "Session review and revoke controls will plug into this page in S25.",
-      tone: "neutral"
+      title: sessions.length > 1 ? "Multiple active sessions" : "Single active session",
+      detail:
+        sessions.length > 1
+          ? `${sessions.length} active sessions are currently associated with your account.`
+          : "Only your current browser session is active right now.",
+      tone: sessions.length > 1 ? "attention" : "good"
     }
   ];
 }
@@ -61,8 +68,13 @@ function roleCanManagePolicy(role: AppSession["role"]) {
   return role === "Owner" || role === "Admin";
 }
 
-export function SecurityPageShell({ session, twoFactorState }: SecurityPageShellProps) {
-  const events = buildSecurityEvents(session, twoFactorState);
+export function SecurityPageShell({
+  session,
+  twoFactorState,
+  sessions,
+  currentSessionId
+}: SecurityPageShellProps) {
+  const events = buildSecurityEvents(session, twoFactorState, sessions);
   const canManageTenantPolicy = roleCanManagePolicy(session.role);
 
   return (
@@ -105,13 +117,9 @@ export function SecurityPageShell({ session, twoFactorState }: SecurityPageShell
                 <h2>Sessions</h2>
                 <p className="auth-subtitle">Review where your account is active and revoke access when needed.</p>
               </div>
-              <span className="security-status-badge is-pending">Coming in S25</span>
+              <span className="security-status-badge is-good">Active now</span>
             </div>
-            <div className="security-session-card" data-testid="security-current-session">
-              <strong>Current session</strong>
-              <span>{session.email}</span>
-              <span>{session.tenantName ?? "Workspace"}</span>
-            </div>
+            <SecuritySessionsCard currentSessionId={currentSessionId} initialSessions={sessions} />
           </section>
         </div>
 
@@ -135,8 +143,8 @@ export function SecurityPageShell({ session, twoFactorState }: SecurityPageShell
             </article>
             <article className="security-policy-item">
               <span className="settings-label">Session review</span>
-              <strong>Planned</strong>
-              <p>Per-user session inventory and revoke controls arrive in S25.</p>
+              <strong>Live</strong>
+              <p>Each user can now review active sessions and revoke any session that is no longer trusted.</p>
             </article>
             <article className="security-policy-item">
               <span className="settings-label">Role impact</span>
