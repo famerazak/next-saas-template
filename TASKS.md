@@ -103,10 +103,10 @@ Each slice should ship something real a user can see/use.
 - [x] **S31 - Add/update card details** [billing]
   - Owner can add or update payment method via Stripe flow.
 
-- [ ] **S32 - Billing summary + invoices list** [billing][app]
+- [x] **S32 - Billing summary + invoices list** [billing][app]
   - Tenant sees plan/seat summary on the dashboard and the owner can view recent invoices in billing.
 
-- [ ] **S35 - Webhook ingestion + idempotent behavior** [webhook][billing]
+- [x] **S35 - Webhook ingestion + idempotent behavior** [webhook][billing]
   - Stripe webhook events are accepted, reflected in app state, and duplicate events do not create duplicate state changes.
 
 - [ ] **S36 - Failed webhook retry + dead-letter visibility** [platform][webhook][billing]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S31 - Add/update card details`
+- [x] Current active slice: `S35 - Webhook ingestion + idempotent behavior`
 - [ ] Link PR/branch next to each completed slice.

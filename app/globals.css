@@ -636,10 +636,73 @@ body::before {
   box-shadow: 0 12px 24px rgba(37, 99, 235, 0.2);
 }
 
+.billing-payment-button.is-secondary {
+  background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+  box-shadow: 0 12px 24px rgba(20, 184, 166, 0.2);
+}
+
+.billing-payment-button.is-ghost {
+  background: rgba(241, 245, 249, 0.96);
+  color: #334155;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  box-shadow: none;
+}
+
 .billing-payment-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+.billing-webhook-card {
+  border: 1px solid rgba(203, 213, 225, 0.72);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 250, 252, 0.92));
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  padding: 1.35rem;
+}
+
+.billing-webhook-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.billing-webhook-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.billing-webhook-activity-list {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.billing-webhook-activity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+  padding: 1rem;
+}
+
+.billing-webhook-activity-row strong {
+  display: block;
+  color: #0f172a;
+}
+
+.billing-webhook-activity-row p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
 }
 
 .payment-setup-card {
@@ -1681,6 +1744,7 @@ body::before {
 
   .billing-summary-grid,
   .billing-ready-grid,
+  .billing-webhook-summary-grid,
   .billing-payment-summary,
   .billing-plan-grid,
   .billing-checkout-controls,
@@ -1753,6 +1817,12 @@ body::before {
 
   .team-members-action {
     justify-content: flex-start;
+  }
+
+  .billing-webhook-actions,
+  .billing-webhook-activity-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .dashboard-note-header {
