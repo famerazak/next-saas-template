@@ -78,7 +78,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S21 - Security page shell + tenant policy placeholder + personal events** [security][ui]
   - `/security` exists with 2FA/session sections, tenant policy placeholder, and personal security event history.
 
-- [ ] **S22 - User can enroll in 2FA** [security][auth]
+- [x] **S22 - User can enroll in 2FA** [security][auth]
   - User can start setup, scan TOTP QR, and complete enrollment.
 
 - [ ] **S23 - User can complete 2FA challenge on login** [security][auth]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S21 - Security page shell + tenant policy placeholder + personal events`
+- [x] Current active slice: `S22 - User can enroll in 2FA`
 - [ ] Link PR/branch next to each completed slice.

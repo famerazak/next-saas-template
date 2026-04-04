@@ -1,7 +1,10 @@
 import type { AppSession } from "@/lib/auth/session";
+import type { TwoFactorState } from "@/lib/security/two-factor";
+import { TwoFactorEnrollmentCard } from "@/components/two-factor-enrollment-card";
 
 type SecurityPageShellProps = {
   session: AppSession;
+  twoFactorState: TwoFactorState;
 };
 
 type SecurityEvent = {
@@ -10,7 +13,7 @@ type SecurityEvent = {
   tone: "neutral" | "good" | "attention";
 };
 
-function buildSecurityEvents(session: AppSession): SecurityEvent[] {
+function buildSecurityEvents(session: AppSession, twoFactorState: TwoFactorState): SecurityEvent[] {
   const role = session.role ?? "Member";
   const tenantName = session.tenantName ?? "Workspace";
 
@@ -20,11 +23,17 @@ function buildSecurityEvents(session: AppSession): SecurityEvent[] {
       detail: `You are signed in to ${tenantName} as ${role}.`,
       tone: "good"
     },
-    {
-      title: "2FA enrollment pending",
-      detail: "This starter has not enrolled a TOTP factor yet. The setup flow lands in S22.",
-      tone: "attention"
-    },
+    twoFactorState.isEnabled
+      ? {
+          title: "2FA enabled",
+          detail: "An authenticator app is enrolled for your account.",
+          tone: "good"
+        }
+      : {
+          title: "2FA enrollment pending",
+          detail: "You have not enrolled a TOTP factor yet. Start setup from the security page.",
+          tone: "attention"
+        },
     {
       title: "Session controls staged",
       detail: "Session review and revoke controls will plug into this page in S25.",
@@ -37,8 +46,8 @@ function roleCanManagePolicy(role: AppSession["role"]) {
   return role === "Owner" || role === "Admin";
 }
 
-export function SecurityPageShell({ session }: SecurityPageShellProps) {
-  const events = buildSecurityEvents(session);
+export function SecurityPageShell({ session, twoFactorState }: SecurityPageShellProps) {
+  const events = buildSecurityEvents(session, twoFactorState);
   const canManageTenantPolicy = roleCanManagePolicy(session.role);
 
   return (
@@ -63,11 +72,11 @@ export function SecurityPageShell({ session }: SecurityPageShellProps) {
                 <h2>Two-factor authentication</h2>
                 <p className="auth-subtitle">Protect your account with a second sign-in step.</p>
               </div>
-              <span className="security-status-badge is-pending">Coming in S22</span>
+              <span className={`security-status-badge ${twoFactorState.isEnabled ? "is-good" : "is-pending"}`}>
+                {twoFactorState.isEnabled ? "Enabled" : "Not enrolled"}
+              </span>
             </div>
-            <p className="security-placeholder-copy">
-              TOTP enrollment, verification, and recovery flows will connect here next.
-            </p>
+            <TwoFactorEnrollmentCard initialState={twoFactorState} />
           </section>
 
           <section className="security-section" data-testid="security-sessions-section">
@@ -101,8 +110,8 @@ export function SecurityPageShell({ session }: SecurityPageShellProps) {
           <div className="security-policy-grid">
             <article className="security-policy-item">
               <span className="settings-label">2FA requirement</span>
-              <strong>Optional for now</strong>
-              <p>Users can enroll later, but it is not forced yet.</p>
+              <strong>Optional, self-serve enrollment</strong>
+              <p>Users can enroll now, but login enforcement is not forced yet.</p>
             </article>
             <article className="security-policy-item">
               <span className="settings-label">Session review</span>

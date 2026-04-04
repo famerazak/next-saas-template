@@ -23,7 +23,7 @@ test("S21: signed-in user can open security page and see personal event history"
 
   await expect(page).toHaveURL(/\/security$/);
   await expect(page.getByTestId("security-page")).toBeVisible();
-  await expect(page.getByTestId("security-2fa-section")).toContainText("Coming in S22");
+  await expect(page.getByTestId("security-2fa-section")).toContainText("Not enrolled");
   await expect(page.getByTestId("security-sessions-section")).toContainText("Coming in S25");
   await expect(page.getByTestId("security-events-section")).toContainText("Current session active");
   await expect(page.getByTestId("security-events-section")).toContainText("2FA enrollment pending");
@@ -37,4 +37,5 @@ test("S21: admin sees tenant policy placeholder with admin preview state", async
   await expect(page.getByTestId("security-policy-section")).toContainText(
     "Owner/Admin will manage tenant-wide policy"
   );
+  await expect(page.getByTestId("security-policy-section")).toContainText("Optional, self-serve enrollment");
 });

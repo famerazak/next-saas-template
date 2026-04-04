@@ -484,6 +484,82 @@ body::before {
   line-height: 1.5;
 }
 
+.two-factor-card {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.two-factor-setup-grid {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.two-factor-qr-panel,
+.two-factor-secret-box,
+.two-factor-summary {
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 16px;
+  background: rgba(248, 250, 252, 0.92);
+  padding: 0.95rem;
+}
+
+.two-factor-qr-panel {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.two-factor-secret-box {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.two-factor-secret-box code,
+.two-factor-summary-meta span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  background: rgba(255, 255, 255, 0.94);
+  padding: 0.65rem 0.8rem;
+  color: #0f172a;
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
+  word-break: break-word;
+}
+
+.two-factor-verify-form {
+  align-self: stretch;
+}
+
+.two-factor-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+}
+
+.two-factor-summary strong {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 1rem;
+}
+
+.two-factor-summary .auth-subtitle {
+  margin: 0.45rem 0 0;
+}
+
+.two-factor-summary-meta {
+  display: grid;
+  gap: 0.65rem;
+  min-width: 220px;
+}
+
 .security-session-card,
 .security-policy-item,
 .security-event-item {
@@ -1236,7 +1312,8 @@ body::before {
   }
 
   .security-grid,
-  .security-policy-grid {
+  .security-policy-grid,
+  .two-factor-setup-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1260,6 +1337,14 @@ body::before {
 
   .security-section-header {
     flex-direction: column;
+  }
+
+  .two-factor-summary {
+    flex-direction: column;
+  }
+
+  .two-factor-summary-meta {
+    min-width: 0;
   }
 
   .team-members-action {
