@@ -244,11 +244,11 @@ export function PlatformDashboard({ adminEmail, snapshot }: PlatformDashboardPro
           </article>
         </div>
 
-        <div className="platform-quick-grid">
-          <article className="platform-quick-item" data-testid="platform-home-card-webhooks">
-            <div>
-              <span className="settings-label">Reliability</span>
-              <strong>Webhook jobs</strong>
+      <div className="platform-quick-grid">
+        <article className="platform-quick-item" data-testid="platform-home-card-webhooks">
+          <div>
+            <span className="settings-label">Reliability</span>
+            <strong>Webhook jobs</strong>
               <p>Inspect dead letters, review retry history, and replay failed deliveries without leaving platform tools.</p>
             </div>
             <Link
@@ -256,10 +256,20 @@ export function PlatformDashboard({ adminEmail, snapshot }: PlatformDashboardPro
               className="audit-log-details-button"
               data-testid="platform-home-link-webhooks"
             >
-              Open webhook jobs
-            </Link>
-          </article>
-        </div>
+            Open webhook jobs
+          </Link>
+        </article>
+        <article className="platform-quick-item" data-testid="platform-home-card-users">
+          <div>
+            <span className="settings-label">Users</span>
+            <strong>Global user directory</strong>
+            <p>Search users across tenants and inspect each user&apos;s active memberships from one platform surface.</p>
+          </div>
+          <Link href="/platform/users" className="audit-log-details-button" data-testid="platform-home-link-users">
+            Open users directory
+          </Link>
+        </article>
+      </div>
 
         <div className="platform-toolbar" data-testid="platform-tenant-toolbar">
           <label htmlFor="platform-tenant-search">
