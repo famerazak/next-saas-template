@@ -711,6 +711,41 @@ body::before {
   gap: 1rem;
 }
 
+.platform-home-card {
+  width: min(100%, 1080px);
+}
+
+.platform-home-grid {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.platform-home-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.92);
+  padding: 1rem;
+}
+
+.platform-home-item strong {
+  display: block;
+  margin-top: 0.15rem;
+  color: #0f172a;
+  font-size: 1rem;
+}
+
+.platform-home-item p {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+  max-width: 60ch;
+}
+
 .platform-webhook-section {
   border: 1px solid rgba(203, 213, 225, 0.72);
   border-radius: 24px;
@@ -2171,6 +2206,10 @@ body::before {
   .platform-webhook-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .platform-home-item {
+    flex-direction: column;
   }
 
   .platform-webhook-row-actions {
