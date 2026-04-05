@@ -144,7 +144,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S52 - Platform can edit tenant member roles** [platform][rbac]
   - Direct role-edit actions work from tenant detail and require a reason before privileged writes complete.
 
-- [ ] **S53 - Platform users page** [platform]
+- [x] **S53 - Platform users page** [platform]
   - Search global users and inspect memberships.
 
 - [ ] **S54 - Platform billing/support ops with required reason** [platform][billing]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S52 - Platform can edit tenant member roles`
+- [x] Current active slice: `S53 - Platform users page`
 - [ ] Link PR/branch next to each completed slice.

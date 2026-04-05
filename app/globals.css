@@ -755,7 +755,8 @@ body::before {
 
 .platform-kpi-card,
 .platform-tenant-card,
-.platform-tenant-detail-card {
+.platform-tenant-detail-card,
+.platform-user-card {
   border: 1px solid rgba(203, 213, 225, 0.8);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.9);
@@ -775,6 +776,7 @@ body::before {
 
 .platform-kpi-card p,
 .platform-tenant-card p,
+.platform-user-card p,
 .platform-tenant-detail-card p,
 .platform-tenant-detail-section-header p {
   margin: 0;
@@ -809,24 +811,35 @@ body::before {
 }
 
 .platform-tenant-list,
+.platform-user-list,
 .platform-members-list,
+.platform-membership-list,
 .platform-billing-grid,
 .platform-tenant-detail-grid {
   display: grid;
   gap: 0.85rem;
 }
 
-.platform-tenant-card {
+.platform-tenant-list,
+.platform-user-list {
+  position: relative;
+  z-index: 1;
+}
+
+.platform-tenant-card,
+.platform-user-card {
   display: grid;
   gap: 0.85rem;
 }
 
-.platform-tenant-card.is-selected {
+.platform-tenant-card.is-selected,
+.platform-user-card.is-selected {
   border-color: rgba(37, 99, 235, 0.34);
   box-shadow: 0 18px 36px rgba(37, 99, 235, 0.08);
 }
 
 .platform-tenant-card-heading,
+.platform-user-card-heading,
 .platform-tenant-detail-header,
 .platform-tenant-detail-section-header {
   display: flex;
@@ -836,6 +849,7 @@ body::before {
 }
 
 .platform-tenant-card-heading strong,
+.platform-user-card-heading strong,
 .platform-tenant-detail-header h2,
 .platform-tenant-detail-section-header h3 {
   margin: 0;
@@ -843,12 +857,15 @@ body::before {
 }
 
 .platform-tenant-card-heading p,
+.platform-user-card-heading p,
 .platform-tenant-card-meta,
+.platform-user-card-meta,
 .platform-tenant-detail-grid p {
   margin-top: 0.35rem;
 }
 
-.platform-tenant-card-meta {
+.platform-tenant-card-meta,
+.platform-user-card-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 0.55rem;
@@ -857,14 +874,17 @@ body::before {
 }
 
 .platform-tenant-card-meta span,
+.platform-user-card-meta span,
 .platform-billing-item,
-.platform-member-row {
+.platform-member-row,
+.platform-membership-row {
   border-radius: 14px;
   background: rgba(248, 250, 252, 0.96);
   border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
-.platform-tenant-card-meta span {
+.platform-tenant-card-meta span,
+.platform-user-card-meta span {
   padding: 0.35rem 0.6rem;
 }
 
@@ -873,6 +893,7 @@ body::before {
   top: 92px;
   display: grid;
   gap: 1rem;
+  z-index: 0;
 }
 
 .platform-tenant-detail-header h2 {
@@ -904,6 +925,27 @@ body::before {
 .platform-member-row strong {
   display: block;
   margin-bottom: 0.2rem;
+}
+
+.platform-membership-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.8rem 0.9rem;
+}
+
+.platform-membership-row strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.platform-membership-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .platform-member-actions {
@@ -2456,7 +2498,9 @@ body::before {
 
   .platform-quick-item,
   .platform-member-row,
+  .platform-membership-row,
   .platform-tenant-card-heading,
+  .platform-user-card-heading,
   .platform-tenant-detail-header,
   .platform-tenant-detail-section-header {
     flex-direction: column;
