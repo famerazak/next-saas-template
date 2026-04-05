@@ -287,6 +287,20 @@ export function PlatformDashboard({ adminEmail, snapshot }: PlatformDashboardPro
             Open compliance explorer
           </Link>
         </article>
+        <article className="platform-quick-item" data-testid="platform-home-card-settings">
+          <div>
+            <span className="settings-label">Settings</span>
+            <strong>Feature flags and defaults</strong>
+            <p>Update global starter defaults and tenant-scoped overrides from one platform settings surface.</p>
+          </div>
+          <Link
+            href="/platform/settings"
+            className="audit-log-details-button"
+            data-testid="platform-home-link-settings"
+          >
+            Open platform settings
+          </Link>
+        </article>
         <article className="platform-quick-item" data-testid="platform-home-card-users">
           <div>
             <span className="settings-label">Users</span>

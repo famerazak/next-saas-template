@@ -153,7 +153,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S56 - Platform compliance explorer + webhook/job operations** [platform][security][webhook]
   - Admin can view global audit/security events and inspect/retry failed jobs or webhooks.
 
-- [ ] **S58 - Platform feature flags + system settings** [platform]
+- [x] **S58 - Platform feature flags + system settings** [platform]
   - Admin can view/update global and tenant-scoped flags and edit policy/retention defaults.
 
 ---
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S56 - Platform compliance explorer + webhook/job operations`
+- [x] Current active slice: `S58 - Platform feature flags + system settings`
 - [ ] Link PR/branch next to each completed slice.

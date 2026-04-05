@@ -267,6 +267,47 @@ body::before {
   width: min(100%, 1240px);
 }
 
+.platform-settings-card {
+  width: min(100%, 1220px);
+}
+
+.platform-settings-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 1rem;
+}
+
+.platform-settings-toggle-list {
+  display: grid;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.platform-settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.85rem 1rem;
+}
+
+.platform-settings-tenant-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.platform-settings-tenant-layout .platform-tenant-list {
+  z-index: 0;
+}
+
+.platform-settings-tenant-layout .platform-tenant-detail {
+  z-index: 2;
+}
+
 .platform-compliance-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
@@ -348,6 +389,8 @@ body::before {
 }
 
 @media (max-width: 880px) {
+  .platform-settings-layout,
+  .platform-settings-tenant-layout,
   .platform-compliance-layout,
   .platform-ops-form-grid {
     grid-template-columns: 1fr;
