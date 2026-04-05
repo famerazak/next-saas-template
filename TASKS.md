@@ -147,7 +147,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S53 - Platform users page** [platform]
   - Search global users and inspect memberships.
 
-- [ ] **S54 - Platform billing/support ops with required reason** [platform][billing]
+- [x] **S54 - Platform billing/support ops with required reason** [platform][billing]
   - Admin can perform manual billing adjustments and support actions with required reason/ticket context.
 
 - [ ] **S56 - Platform compliance explorer + webhook/job operations** [platform][security][webhook]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S53 - Platform users page`
+- [x] Current active slice: `S54 - Platform billing/support ops with required reason`
 - [ ] Link PR/branch next to each completed slice.

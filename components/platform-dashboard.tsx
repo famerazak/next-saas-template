@@ -259,6 +259,20 @@ export function PlatformDashboard({ adminEmail, snapshot }: PlatformDashboardPro
             Open webhook jobs
           </Link>
         </article>
+        <article className="platform-quick-item" data-testid="platform-home-card-billing-support">
+          <div>
+            <span className="settings-label">Billing and support</span>
+            <strong>Operator actions</strong>
+            <p>Log manual credits, invoice corrections, and support interventions with required ticket and reason context.</p>
+          </div>
+          <Link
+            href="/platform/billing-support"
+            className="audit-log-details-button"
+            data-testid="platform-home-link-billing-support"
+          >
+            Open billing support ops
+          </Link>
+        </article>
         <article className="platform-quick-item" data-testid="platform-home-card-users">
           <div>
             <span className="settings-label">Users</span>
