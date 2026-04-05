@@ -356,6 +356,42 @@ export async function verifyTwoFactorChallengeForUser(
   return currentState;
 }
 
+export async function loadPlatformTwoFactorStates(): Promise<TwoFactorState[]> {
+  const supabase = getServiceClient();
+  if (!supabase) {
+    return [...getLocalTwoFactorStore().entries()]
+      .map(([userId, record]) => buildState(userId, record.email, record))
+      .sort((left, right) => left.email.localeCompare(right.email));
+  }
+
+  const { data, error } = await supabase
+    .from("user_two_factor_factors")
+    .select(
+      "user_id, email, totp_secret, enabled_at, backup_code_hashes, backup_codes_generated_at, pending_secret, pending_started_at"
+    )
+    .returns<TwoFactorRow[]>();
+
+  if (error || !data) {
+    return [...getLocalTwoFactorStore().entries()]
+      .map(([userId, record]) => buildState(userId, record.email, record))
+      .sort((left, right) => left.email.localeCompare(right.email));
+  }
+
+  return data
+    .map((row) =>
+      buildState(row.user_id, row.email ?? row.user_id, {
+        email: row.email ?? row.user_id,
+        enabledSecret: row.totp_secret,
+        enabledAt: row.enabled_at,
+        backupCodeHashes: row.backup_code_hashes ?? [],
+        backupCodesGeneratedAt: row.backup_codes_generated_at,
+        pendingSecret: row.pending_secret,
+        pendingStartedAt: row.pending_started_at
+      })
+    )
+    .sort((left, right) => left.email.localeCompare(right.email));
+}
+
 function createBackupCodes(count = 8): string[] {
   return Array.from({ length: count }, () => {
     const raw = randomBytes(5).toString("base64url").toUpperCase().replace(/[^A-Z2-9]/g, "");

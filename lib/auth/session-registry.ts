@@ -13,6 +13,14 @@ export type SessionRecord = {
   revokedAt: string | null;
 };
 
+export type PlatformSessionSummary = {
+  userId: string;
+  email: string;
+  tenantNames: string[];
+  sessionCount: number;
+  lastSeenAt: string;
+};
+
 type SessionRegistryRow = {
   session_id: string;
   user_id: string;
@@ -245,4 +253,71 @@ export async function revokeUserSession(userId: string, sessionId: string): Prom
     ...local,
     revokedAt
   });
+}
+
+export async function loadPlatformSessionSummaries(): Promise<PlatformSessionSummary[]> {
+  const supabase = getServiceClient();
+  if (supabase) {
+    const { data, error } = await supabase
+      .from("user_sessions")
+      .select("session_id, user_id, email, tenant_name, role, user_agent_label, created_at, last_seen_at, revoked_at")
+      .is("revoked_at", null)
+      .returns<SessionRegistryRow[]>();
+
+    if (!error && data) {
+      const grouped = new Map<string, PlatformSessionSummary>();
+      for (const row of data.map(mapRow)) {
+        const existing = grouped.get(row.userId);
+        if (existing) {
+          existing.sessionCount += 1;
+          existing.lastSeenAt = existing.lastSeenAt > row.lastSeenAt ? existing.lastSeenAt : row.lastSeenAt;
+          if (!existing.tenantNames.includes(row.tenantName)) {
+            existing.tenantNames.push(row.tenantName);
+            existing.tenantNames.sort((left, right) => left.localeCompare(right));
+          }
+          continue;
+        }
+
+        grouped.set(row.userId, {
+          userId: row.userId,
+          email: row.email,
+          tenantNames: [row.tenantName],
+          sessionCount: 1,
+          lastSeenAt: row.lastSeenAt
+        });
+      }
+
+      return [...grouped.values()].sort((left, right) => right.lastSeenAt.localeCompare(left.lastSeenAt));
+    }
+  }
+
+  const grouped = new Map<string, PlatformSessionSummary>();
+  for (const userSessions of getLocalRegistry().values()) {
+    for (const session of userSessions.values()) {
+      if (session.revokedAt) {
+        continue;
+      }
+
+      const existing = grouped.get(session.userId);
+      if (existing) {
+        existing.sessionCount += 1;
+        existing.lastSeenAt = existing.lastSeenAt > session.lastSeenAt ? existing.lastSeenAt : session.lastSeenAt;
+        if (!existing.tenantNames.includes(session.tenantName)) {
+          existing.tenantNames.push(session.tenantName);
+          existing.tenantNames.sort((left, right) => left.localeCompare(right));
+        }
+        continue;
+      }
+
+      grouped.set(session.userId, {
+        userId: session.userId,
+        email: session.email,
+        tenantNames: [session.tenantName],
+        sessionCount: 1,
+        lastSeenAt: session.lastSeenAt
+      });
+    }
+  }
+
+  return [...grouped.values()].sort((left, right) => right.lastSeenAt.localeCompare(left.lastSeenAt));
 }

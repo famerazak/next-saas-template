@@ -224,3 +224,32 @@ export async function loadTenantAuditEventsForSession(
 
   return data.map(toEvent);
 }
+
+export async function loadPlatformAuditEvents(options?: { limit?: number }): Promise<TenantAuditEvent[]> {
+  const limit = Math.max(1, Math.min(options?.limit ?? 100, 250));
+  const supabase = getServiceClient();
+  if (!supabase || process.env.E2E_AUTH_BYPASS === "1") {
+    return [...getLocalStore().values()]
+      .flatMap((events) => events)
+      .sort((left, right) => right.occurredAt.localeCompare(left.occurredAt))
+      .slice(0, limit);
+  }
+
+  const { data, error } = await supabase
+    .from("tenant_audit_logs")
+    .select(
+      "id, tenant_id, action, summary, actor_user_id, actor_email, actor_name, actor_role, origin, target_type, target_id, target_label, metadata, occurred_at"
+    )
+    .order("occurred_at", { ascending: false })
+    .limit(limit)
+    .returns<AuditLogRow[]>();
+
+  if (error || !data) {
+    return [...getLocalStore().values()]
+      .flatMap((events) => events)
+      .sort((left, right) => right.occurredAt.localeCompare(left.occurredAt))
+      .slice(0, limit);
+  }
+
+  return data.map(toEvent);
+}
