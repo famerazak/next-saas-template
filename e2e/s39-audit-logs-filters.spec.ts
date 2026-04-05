@@ -28,8 +28,8 @@ test("S39: admin can search and filter tenant audit logs", async ({ page }) => {
   await page.goto("/audit-logs");
   await expect(page.getByTestId("audit-log-console")).toBeVisible();
   await expect(page.getByTestId("audit-log-results-summary")).toContainText("Showing 2 of 2 events");
-  await expect(page.getByTestId("audit-export-csv-button")).toBeDisabled();
-  await expect(page.getByTestId("audit-export-json-button")).toBeDisabled();
+  await expect(page.getByTestId("audit-export-csv-button")).toBeVisible();
+  await expect(page.getByTestId("audit-export-json-button")).toBeVisible();
 
   await page.getByTestId("audit-log-search-input").fill(inviteEmail);
   await expect(page.getByTestId("audit-log-results-summary")).toContainText("Showing 1 of 2 events");

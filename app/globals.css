@@ -1528,14 +1528,27 @@ body::before {
 }
 
 .audit-log-export-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid rgba(203, 213, 225, 0.9);
   border-radius: 12px;
   background: rgba(248, 250, 252, 0.95);
-  color: #64748b;
+  color: #1e293b;
   padding: 0.62rem 0.9rem;
   font-size: 0.9rem;
   font-weight: 700;
-  cursor: not-allowed;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.audit-log-export-button:hover {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(239, 246, 255, 0.96);
+  transform: translateY(-1px);
 }
 
 .audit-log-results-summary {
