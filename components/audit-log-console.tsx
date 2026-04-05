@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { AuditLogDetailsPanel } from "@/components/audit-log-details-panel";
 import { AuditLogList } from "@/components/audit-log-list";
 import type { TenantAuditEvent } from "@/lib/audit/store";
 
@@ -16,6 +17,7 @@ export function AuditLogConsole({ events }: AuditLogConsoleProps) {
   const [query, setQuery] = useState("");
   const [actionFilter, setActionFilter] = useState("all");
   const [originFilter, setOriginFilter] = useState<"all" | "tenant" | "platform">("all");
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(events[0]?.id ?? null);
 
   const actionOptions = useMemo(
     () => [...new Set(events.map((event) => event.action))].sort((left, right) => left.localeCompare(right)),
@@ -54,6 +56,20 @@ export function AuditLogConsole({ events }: AuditLogConsoleProps) {
       return haystack.includes(normalizedQuery);
     });
   }, [actionFilter, events, originFilter, query]);
+
+  useEffect(() => {
+    if (filteredEvents.length === 0) {
+      setSelectedEventId(null);
+      return;
+    }
+
+    const existingSelection = filteredEvents.find((event) => event.id === selectedEventId);
+    if (!existingSelection) {
+      setSelectedEventId(filteredEvents[0]?.id ?? null);
+    }
+  }, [filteredEvents, selectedEventId]);
+
+  const selectedEvent = filteredEvents.find((event) => event.id === selectedEventId) ?? null;
 
   return (
     <section className="auth-card settings-card audit-log-card" data-testid="audit-log-console">
@@ -129,7 +145,14 @@ export function AuditLogConsole({ events }: AuditLogConsoleProps) {
         Showing {filteredEvents.length} of {events.length} events
       </div>
 
-      <AuditLogList events={filteredEvents} />
+      <div className="audit-log-layout" data-testid="audit-log-layout">
+        <AuditLogList
+          events={filteredEvents}
+          selectedEventId={selectedEventId}
+          onSelectEvent={(event) => setSelectedEventId(event.id)}
+        />
+        <AuditLogDetailsPanel event={selectedEvent} />
+      </div>
     </section>
   );
 }

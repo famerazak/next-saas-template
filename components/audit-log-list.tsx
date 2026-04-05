@@ -2,6 +2,8 @@ import type { TenantAuditEvent } from "@/lib/audit/store";
 
 type AuditLogListProps = {
   events: TenantAuditEvent[];
+  selectedEventId: string | null;
+  onSelectEvent: (event: TenantAuditEvent) => void;
 };
 
 function formatOccurredAt(value: string) {
@@ -11,7 +13,7 @@ function formatOccurredAt(value: string) {
   }).format(new Date(value));
 }
 
-export function AuditLogList({ events }: AuditLogListProps) {
+export function AuditLogList({ events, selectedEventId, onSelectEvent }: AuditLogListProps) {
   if (events.length === 0) {
     return (
       <div className="audit-log-list" data-testid="audit-log-list">
@@ -25,7 +27,11 @@ export function AuditLogList({ events }: AuditLogListProps) {
   return (
     <div className="audit-log-list" data-testid="audit-log-list">
       {events.map((event) => (
-        <article className="audit-log-row" key={event.id} data-testid={`audit-log-row-${event.id}`}>
+        <article
+          className={`audit-log-row${selectedEventId === event.id ? " is-selected" : ""}`}
+          key={event.id}
+          data-testid={`audit-log-row-${event.id}`}
+        >
           <div className="audit-log-row-copy">
             <div className="audit-log-row-heading">
               <strong>{event.summary}</strong>
@@ -46,6 +52,14 @@ export function AuditLogList({ events }: AuditLogListProps) {
                 Reason: {event.metadata.reason}
               </p>
             ) : null}
+            <button
+              type="button"
+              className="audit-log-details-button"
+              onClick={() => onSelectEvent(event)}
+              data-testid={`audit-log-view-details-${event.id}`}
+            >
+              View details
+            </button>
           </div>
         </article>
       ))}
