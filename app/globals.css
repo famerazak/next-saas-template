@@ -259,6 +259,68 @@ body::before {
   margin-bottom: 1rem;
 }
 
+.platform-billing-support-card {
+  width: min(100%, 1180px);
+}
+
+.platform-ops-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.platform-ops-form-grid label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: #334155;
+}
+
+.platform-ops-form-grid input,
+.platform-ops-form-grid select {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  border-radius: 12px;
+  padding: 0.68rem 0.72rem;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+}
+
+.platform-ops-history-list {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.platform-ops-history-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.9rem 1rem;
+}
+
+.platform-ops-history-row p {
+  margin: 0.18rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 880px) {
+  .platform-ops-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .platform-ops-history-row {
+    flex-direction: column;
+  }
+}
+
 .dashboard-invites-card {
   margin-top: 1rem;
 }

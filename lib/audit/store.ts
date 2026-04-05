@@ -12,7 +12,9 @@ export type TenantAuditAction =
   | "team.ownership.transferred"
   | "billing.checkout.started"
   | "billing.payment_method.updated"
-  | "platform.webhook.retry";
+  | "platform.webhook.retry"
+  | "platform.billing.adjusted"
+  | "platform.support.updated";
 
 export type TenantAuditMetadata = Record<string, string | number | boolean | null>;
 
