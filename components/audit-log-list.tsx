@@ -41,6 +41,11 @@ export function AuditLogList({ events }: AuditLogListProps) {
               {event.targetLabel ? <span>{event.targetLabel}</span> : null}
               <span>{formatOccurredAt(event.occurredAt)}</span>
             </div>
+            {event.origin === "platform" && typeof event.metadata.reason === "string" ? (
+              <p className="audit-log-platform-reason" data-testid={`audit-log-platform-reason-${event.id}`}>
+                Reason: {event.metadata.reason}
+              </p>
+            ) : null}
           </div>
         </article>
       ))}

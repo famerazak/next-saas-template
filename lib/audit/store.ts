@@ -10,7 +10,8 @@ export type TenantAuditAction =
   | "team.member.removed"
   | "team.ownership.transferred"
   | "billing.checkout.started"
-  | "billing.payment_method.updated";
+  | "billing.payment_method.updated"
+  | "platform.webhook.retry";
 
 export type TenantAuditMetadata = Record<string, string | number | boolean | null>;
 
@@ -108,6 +109,7 @@ function toEvent(row: AuditLogRow): TenantAuditEvent {
 export async function recordTenantAuditEventForSession(
   session: AppSession,
   input: {
+    tenantId?: string;
     action: TenantAuditAction | string;
     summary: string;
     targetType?: string;
@@ -117,13 +119,14 @@ export async function recordTenantAuditEventForSession(
     origin?: TenantAuditOrigin;
   }
 ): Promise<{ event: TenantAuditEvent; persistedToDatabase: boolean }> {
-  if (!session.tenantId) {
+  const targetTenantId = input.tenantId ?? session.tenantId;
+  if (!targetTenantId) {
     throw new Error("Tenant context is required.");
   }
 
   const event: TenantAuditEvent = {
     id: `audit_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`,
-    tenantId: session.tenantId,
+    tenantId: targetTenantId,
     action: input.action,
     summary: input.summary,
     actorUserId: session.userId,
@@ -141,8 +144,8 @@ export async function recordTenantAuditEventForSession(
   const supabase = getServiceClient();
   if (!supabase || process.env.E2E_AUTH_BYPASS === "1") {
     const store = getLocalStore();
-    const existing = store.get(session.tenantId) ?? [];
-    store.set(session.tenantId, [event, ...existing].slice(0, 250));
+    const existing = store.get(targetTenantId) ?? [];
+    store.set(targetTenantId, [event, ...existing].slice(0, 250));
     return {
       event,
       persistedToDatabase: false
@@ -174,8 +177,8 @@ export async function recordTenantAuditEventForSession(
 
   if (error || !data) {
     const store = getLocalStore();
-    const existing = store.get(session.tenantId) ?? [];
-    store.set(session.tenantId, [event, ...existing].slice(0, 250));
+    const existing = store.get(targetTenantId) ?? [];
+    store.set(targetTenantId, [event, ...existing].slice(0, 250));
     return {
       event,
       persistedToDatabase: false

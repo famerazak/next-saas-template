@@ -691,7 +691,12 @@ export async function loadPlatformWebhookJobsSnapshot(): Promise<PlatformWebhook
   };
 }
 
-export async function retryWebhookDeadLetter(deadLetterId: string): Promise<{ eventId: string }> {
+export async function retryWebhookDeadLetter(deadLetterId: string): Promise<{
+  eventId: string;
+  tenantId: string;
+  eventType: BillingWebhookEventType;
+  failureReason: string;
+}> {
   for (const [tenantId, state] of getLocalBillingStore().entries()) {
     const deadLetter = state.deadLetters.find((entry) => entry.deadLetterId === deadLetterId);
     if (!deadLetter) {
@@ -726,7 +731,12 @@ export async function retryWebhookDeadLetter(deadLetterId: string): Promise<{ ev
       ].slice(0, 20)
     });
 
-    return { eventId: deadLetter.eventId };
+    return {
+      eventId: deadLetter.eventId,
+      tenantId: deadLetter.tenantId,
+      eventType: deadLetter.eventType,
+      failureReason: deadLetter.failureReason
+    };
   }
 
   throw new Error("Dead-letter delivery not found.");

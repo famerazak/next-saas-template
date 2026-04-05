@@ -766,6 +766,34 @@ body::before {
   gap: 0.65rem;
 }
 
+.platform-webhook-reason-field {
+  display: grid;
+  gap: 0.35rem;
+  width: min(280px, 100%);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.platform-webhook-reason-input {
+  width: 100%;
+  min-height: 84px;
+  resize: vertical;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0.75rem 0.82rem;
+  color: #0f172a;
+  font: inherit;
+  line-height: 1.45;
+}
+
+.platform-webhook-reason-input:focus {
+  outline: 2px solid rgba(14, 165, 233, 0.18);
+  outline-offset: 1px;
+  border-color: rgba(14, 165, 233, 0.42);
+}
+
 .platform-webhook-retry-count {
   color: #475569;
   font-size: 0.84rem;
@@ -1582,6 +1610,14 @@ body::before {
   color: var(--muted);
 }
 
+.audit-log-platform-reason {
+  margin-top: 0.55rem;
+  border-left: 3px solid rgba(249, 115, 22, 0.35);
+  padding-left: 0.7rem;
+  color: #7c2d12;
+  font-size: 0.9rem;
+}
+
 .audit-log-meta {
   display: flex;
   flex-wrap: wrap;
@@ -2003,6 +2039,10 @@ body::before {
 
   .platform-webhook-row-actions {
     justify-items: start;
+  }
+
+  .platform-webhook-reason-field {
+    width: 100%;
   }
 
   .audit-log-toolbar {

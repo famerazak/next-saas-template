@@ -125,7 +125,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S42 - Audit exports (CSV + JSON) with tenant boundary safety** [app]
   - Owner/Admin can export tenant audit logs to CSV and JSON, and exports contain only current-tenant events.
 
-- [ ] **S45 - Platform-initiated tenant changes appear in tenant logs** [platform][security]
+- [x] **S45 - Platform-initiated tenant changes appear in tenant logs** [platform][security]
   - Tenant admins can see operator actions with reason metadata.
 
 - [ ] **S46 - Audit action details panel** [ui][app]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S42 - Audit exports (CSV + JSON) with tenant boundary safety`
+- [x] Current active slice: `S45 - Platform-initiated tenant changes appear in tenant logs`
 - [ ] Link PR/branch next to each completed slice.

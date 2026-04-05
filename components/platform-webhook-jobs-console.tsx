@@ -5,6 +5,7 @@ import type { BillingWebhookDeadLetter, PlatformWebhookJobsSnapshot } from "@/li
 
 type RetryResponse = {
   eventId?: string;
+  tenantId?: string;
   error?: string;
   snapshot?: PlatformWebhookJobsSnapshot;
 };
@@ -28,10 +29,17 @@ function formatTimestamp(value: string | undefined) {
 export function PlatformWebhookJobsConsole({ initialSnapshot }: PlatformWebhookJobsConsoleProps) {
   const [snapshot, setSnapshot] = useState(initialSnapshot);
   const [submittingId, setSubmittingId] = useState("");
+  const [retryReasons, setRetryReasons] = useState<Record<string, string>>({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   async function retryDeadLetter(deadLetterId: string) {
+    const reason = retryReasons[deadLetterId]?.trim() ?? "";
+    if (reason.length < 8 || reason.length > 240) {
+      setError("Enter a retry reason between 8 and 240 characters.");
+      return;
+    }
+
     setSubmittingId(deadLetterId);
     setMessage("");
     setError("");
@@ -41,7 +49,7 @@ export function PlatformWebhookJobsConsole({ initialSnapshot }: PlatformWebhookJ
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ deadLetterId })
+      body: JSON.stringify({ deadLetterId, reason })
     });
 
     const payload = (await response.json().catch(() => null)) as RetryResponse | null;
@@ -52,8 +60,13 @@ export function PlatformWebhookJobsConsole({ initialSnapshot }: PlatformWebhookJ
     }
 
     setSnapshot(payload.snapshot);
+    setRetryReasons((current) => ({ ...current, [deadLetterId]: "" }));
     setSubmittingId("");
-    setMessage(`Retried webhook ${payload.eventId}.`);
+    setMessage(
+      payload.tenantId
+        ? `Retried webhook ${payload.eventId} for ${payload.tenantId}.`
+        : `Retried webhook ${payload.eventId}.`
+    );
   }
 
   return (
@@ -110,6 +123,27 @@ export function PlatformWebhookJobsConsole({ initialSnapshot }: PlatformWebhookJ
                   </p>
                 </div>
                 <div className="platform-webhook-row-actions">
+                  <label
+                    className="platform-webhook-reason-field"
+                    htmlFor={`platform-retry-reason-${deadLetter.deadLetterId}`}
+                  >
+                    Retry reason
+                    <textarea
+                      id={`platform-retry-reason-${deadLetter.deadLetterId}`}
+                      className="platform-webhook-reason-input"
+                      value={retryReasons[deadLetter.deadLetterId] ?? ""}
+                      placeholder="Explain why this retry is safe now"
+                      maxLength={240}
+                      onChange={(event) => {
+                        const nextValue = event.currentTarget.value;
+                        setRetryReasons((current) => ({
+                          ...current,
+                          [deadLetter.deadLetterId]: nextValue
+                        }));
+                      }}
+                      data-testid={`platform-dead-letter-reason-input-${deadLetter.deadLetterId}`}
+                    />
+                  </label>
                   <span className={`security-status-badge ${deadLetterStatusTone(deadLetter.status)}`}>
                     {deadLetter.status}
                   </span>
