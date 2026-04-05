@@ -138,7 +138,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S48 - Platform routes + nav visibility** [platform][security]
   - `/platform/*` routes render only for `PlatformAdmin`.
 
-- [ ] **S49 - Platform dashboard + tenants list/detail** [platform][ui]
+- [x] **S49 - Platform dashboard + tenants list/detail** [platform][ui]
   - Admin sees KPI cards, can search/filter tenants, and can open tenant detail with members and billing snapshot.
 
 - [ ] **S52 - Platform can edit tenant member roles** [platform][rbac]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S48 - Platform routes + nav visibility`
+- [x] Current active slice: `S49 - Platform dashboard + tenants list/detail`
 - [ ] Link PR/branch next to each completed slice.

@@ -711,17 +711,24 @@ body::before {
   gap: 1rem;
 }
 
-.platform-home-card {
-  width: min(100%, 1080px);
+.platform-dashboard-card {
+  width: min(100%, 1160px);
+  display: grid;
+  gap: 1rem;
 }
 
-.platform-home-grid {
+.platform-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.platform-quick-grid {
   display: grid;
   gap: 0.85rem;
-  margin-top: 1rem;
 }
 
-.platform-home-item {
+.platform-quick-item {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
@@ -732,18 +739,208 @@ body::before {
   padding: 1rem;
 }
 
-.platform-home-item strong {
+.platform-quick-item strong {
   display: block;
   margin-top: 0.15rem;
   color: #0f172a;
   font-size: 1rem;
 }
 
-.platform-home-item p {
+.platform-quick-item p {
   margin: 0.45rem 0 0;
   color: var(--muted);
   line-height: 1.45;
   max-width: 60ch;
+}
+
+.platform-kpi-card,
+.platform-tenant-card,
+.platform-tenant-detail-card {
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1rem;
+}
+
+.platform-kpi-card {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.platform-kpi-card strong {
+  color: #0f172a;
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.platform-kpi-card p,
+.platform-tenant-card p,
+.platform-tenant-detail-card p,
+.platform-tenant-detail-section-header p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.platform-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(220px, 0.8fr);
+  gap: 0.85rem;
+}
+
+.platform-toolbar label {
+  display: grid;
+  gap: 0.45rem;
+  color: #334155;
+  font-size: 0.92rem;
+}
+
+.platform-results-summary {
+  color: #64748b;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.platform-dashboard-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.platform-tenant-list,
+.platform-members-list,
+.platform-billing-grid,
+.platform-tenant-detail-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.platform-tenant-card {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.platform-tenant-card.is-selected {
+  border-color: rgba(37, 99, 235, 0.34);
+  box-shadow: 0 18px 36px rgba(37, 99, 235, 0.08);
+}
+
+.platform-tenant-card-heading,
+.platform-tenant-detail-header,
+.platform-tenant-detail-section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.platform-tenant-card-heading strong,
+.platform-tenant-detail-header h2,
+.platform-tenant-detail-section-header h3 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.platform-tenant-card-heading p,
+.platform-tenant-card-meta,
+.platform-tenant-detail-grid p {
+  margin-top: 0.35rem;
+}
+
+.platform-tenant-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  color: #475569;
+  font-size: 0.85rem;
+}
+
+.platform-tenant-card-meta span,
+.platform-billing-item,
+.platform-member-row {
+  border-radius: 14px;
+  background: rgba(248, 250, 252, 0.96);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.platform-tenant-card-meta span {
+  padding: 0.35rem 0.6rem;
+}
+
+.platform-tenant-detail {
+  position: sticky;
+  top: 92px;
+  display: grid;
+  gap: 1rem;
+}
+
+.platform-tenant-detail-header h2 {
+  font-size: 1.2rem;
+}
+
+.platform-tenant-detail-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.platform-tenant-detail-card {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.platform-tenant-detail-card strong {
+  color: #0f172a;
+  font-size: 1.05rem;
+}
+
+.platform-member-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.8rem 0.9rem;
+}
+
+.platform-member-row strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.platform-billing-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.platform-billing-item {
+  display: grid;
+  gap: 0.22rem;
+  padding: 0.8rem 0.9rem;
+}
+
+.platform-billing-item dt {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.platform-billing-item dd {
+  margin: 0;
+  color: #0f172a;
+  line-height: 1.45;
+}
+
+.platform-dashboard-note {
+  display: grid;
+  gap: 0.35rem;
+  border-radius: 14px;
+  background: rgba(239, 246, 255, 0.75);
+  border: 1px solid rgba(147, 197, 253, 0.28);
+  padding: 0.9rem;
+}
+
+.platform-dashboard-note p {
+  margin: 0;
 }
 
 .platform-webhook-section {
@@ -2208,12 +2405,28 @@ body::before {
     align-items: flex-start;
   }
 
-  .platform-home-item {
+  .platform-webhook-row-actions {
+    justify-items: start;
+  }
+
+  .platform-kpi-grid,
+  .platform-tenant-detail-grid,
+  .platform-billing-grid,
+  .platform-toolbar,
+  .platform-dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .platform-quick-item,
+  .platform-member-row,
+  .platform-tenant-card-heading,
+  .platform-tenant-detail-header,
+  .platform-tenant-detail-section-header {
     flex-direction: column;
   }
 
-  .platform-webhook-row-actions {
-    justify-items: start;
+  .platform-tenant-detail {
+    position: static;
   }
 
   .platform-webhook-reason-field {
