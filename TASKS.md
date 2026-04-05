@@ -160,7 +160,7 @@ Each slice should ship something real a user can see/use.
 
 ## Slice 61-72: Storage, Analytics, Legal, and Hardening UX
 
-- [ ] **S61 - File upload + tenant-scoped visibility** [storage][app]
+- [x] **S61 - File upload + tenant-scoped visibility** [storage][app]
   - User can upload a file, see it in a list, and only view files in the current tenant context.
 
 - [ ] **S63 - Signed download flow** [storage]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S58 - Platform feature flags + system settings`
+- [x] Current active slice: `S61 - File upload + tenant-scoped visibility`
 - [ ] Link PR/branch next to each completed slice.

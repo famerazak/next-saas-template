@@ -19,6 +19,14 @@ const PERMISSION_ROWS: PermissionRow[] = [
     note: "All signed-in users can see tenant context and their own profile link."
   },
   {
+    capability: "Files and uploads",
+    owner: "Full access",
+    admin: "Full access",
+    member: "Full access",
+    viewer: "Read only",
+    note: "All signed-in users can see tenant files. Viewer stays read-only while other roles can upload."
+  },
+  {
     capability: "Tenant settings",
     owner: "Full access",
     admin: "Full access",
