@@ -150,7 +150,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S54 - Platform billing/support ops with required reason** [platform][billing]
   - Admin can perform manual billing adjustments and support actions with required reason/ticket context.
 
-- [ ] **S56 - Platform compliance explorer + webhook/job operations** [platform][security][webhook]
+- [x] **S56 - Platform compliance explorer + webhook/job operations** [platform][security][webhook]
   - Admin can view global audit/security events and inspect/retry failed jobs or webhooks.
 
 - [ ] **S58 - Platform feature flags + system settings** [platform]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S54 - Platform billing/support ops with required reason`
+- [x] Current active slice: `S56 - Platform compliance explorer + webhook/job operations`
 - [ ] Link PR/branch next to each completed slice.

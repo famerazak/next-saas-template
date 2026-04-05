@@ -12,6 +12,7 @@ type RetryResponse = {
 
 type PlatformWebhookJobsConsoleProps = {
   initialSnapshot: PlatformWebhookJobsSnapshot;
+  embedded?: boolean;
 };
 
 function deadLetterStatusTone(status: BillingWebhookDeadLetter["status"]) {
@@ -26,7 +27,7 @@ function formatTimestamp(value: string | undefined) {
   return new Date(value).toLocaleString("en-GB");
 }
 
-export function PlatformWebhookJobsConsole({ initialSnapshot }: PlatformWebhookJobsConsoleProps) {
+export function PlatformWebhookJobsConsole({ initialSnapshot, embedded = false }: PlatformWebhookJobsConsoleProps) {
   const [snapshot, setSnapshot] = useState(initialSnapshot);
   const [submittingId, setSubmittingId] = useState("");
   const [retryReasons, setRetryReasons] = useState<Record<string, string>>({});
@@ -69,11 +70,13 @@ export function PlatformWebhookJobsConsole({ initialSnapshot }: PlatformWebhookJ
     );
   }
 
+  const HeadingTag = embedded ? "h2" : "h1";
+
   return (
     <section className="platform-webhook-card" data-testid="platform-webhooks-page">
-      <div className="settings-header billing-ready-header">
+      <div className={`settings-header billing-ready-header${embedded ? " is-embedded" : ""}`}>
         <div>
-          <h1>Webhook jobs</h1>
+          <HeadingTag>Webhook jobs</HeadingTag>
           <p className="auth-subtitle">
             Inspect failed signed billing deliveries, review failure diagnostics, and retry them after the underlying
             issue is understood.

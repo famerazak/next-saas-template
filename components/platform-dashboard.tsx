@@ -273,6 +273,20 @@ export function PlatformDashboard({ adminEmail, snapshot }: PlatformDashboardPro
             Open billing support ops
           </Link>
         </article>
+        <article className="platform-quick-item" data-testid="platform-home-card-compliance">
+          <div>
+            <span className="settings-label">Compliance</span>
+            <strong>Audit and security explorer</strong>
+            <p>Review cross-tenant audit activity, user security posture, and failed webhook work in one place.</p>
+          </div>
+          <Link
+            href="/platform/compliance"
+            className="audit-log-details-button"
+            data-testid="platform-home-link-compliance"
+          >
+            Open compliance explorer
+          </Link>
+        </article>
         <article className="platform-quick-item" data-testid="platform-home-card-users">
           <div>
             <span className="settings-label">Users</span>
