@@ -12,6 +12,12 @@ export type TeamMember = {
 
 export type EditableTeamRole = Exclude<TenantRole, "Owner">;
 
+export type PlatformTenantMembersSnapshot = {
+  tenantId: string;
+  tenantName: string;
+  members: TeamMember[];
+};
+
 type MembershipRow = {
   user_id: string;
   role: string;
@@ -158,6 +164,19 @@ function loadFromLocalStore(session: AppSession): TeamMember[] {
     role: session.role ?? "Member",
     status: "Active"
   });
+}
+
+export function loadPlatformTenantMembershipsFromLocalStore(): PlatformTenantMembersSnapshot[] {
+  const store = getLocalTeamStore();
+  const tenantNames = getLocalTenantNameStore();
+
+  return [...store.entries()]
+    .map(([tenantId, members]) => ({
+      tenantId,
+      tenantName: tenantNames.get(tenantId) ?? "Workspace",
+      members
+    }))
+    .sort((left, right) => left.tenantName.localeCompare(right.tenantName));
 }
 
 export async function loadTeamMembersForSession(session: AppSession): Promise<TeamMember[]> {

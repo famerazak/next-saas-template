@@ -120,6 +120,19 @@ export type PlatformWebhookJobsSnapshot = {
   recentRetries: BillingWebhookDeadLetter[];
 };
 
+export type PlatformTenantBillingSnapshot = {
+  tenantId: string;
+  currentPlanName: string;
+  seatCount: number;
+  estimatedMonthlyTotal: number;
+  latestInvoiceStatus: BillingInvoiceSyncStatus;
+  processedWebhookCount: number;
+  duplicateWebhookCount: number;
+  pendingDeadLetters: number;
+  invoices: BillingInvoice[];
+  paymentMethodSummary: string | null;
+};
+
 type LocalBillingState = {
   checkout: BillingCheckout | null;
   paymentMethod: BillingPaymentMethod | null;
@@ -188,6 +201,33 @@ function getBillingState(tenantId: string): LocalBillingState {
   };
   store.set(tenantId, fresh);
   return fresh;
+}
+
+export function loadPlatformBillingSnapshotsFromLocalStore(): PlatformTenantBillingSnapshot[] {
+  return [...getLocalBillingStore().entries()]
+    .map(([tenantId, state]) => {
+      const checkout = state.checkout;
+      const fallbackPlanId = checkout?.selectedPlanId ?? "starter";
+      const seatCount = checkout?.seatCount ?? 1;
+      const paymentMethodSummary = state.paymentMethod
+        ? `${state.paymentMethod.brand} ending ${state.paymentMethod.last4}`
+        : null;
+
+      return {
+        tenantId,
+        currentPlanName: checkout?.selectedPlanName ?? "Starter Trial",
+        seatCount,
+        estimatedMonthlyTotal:
+          checkout?.estimatedMonthlyTotal ?? calculateEstimatedMonthlyTotal(fallbackPlanId, seatCount),
+        latestInvoiceStatus: state.latestInvoiceStatus,
+        processedWebhookCount: state.processedWebhookCount,
+        duplicateWebhookCount: state.duplicateWebhookCount,
+        pendingDeadLetters: state.deadLetters.filter((entry) => entry.status === "Pending retry").length,
+        invoices: buildInvoices(checkout, seatCount),
+        paymentMethodSummary
+      };
+    })
+    .sort((left, right) => left.tenantId.localeCompare(right.tenantId));
 }
 
 function saveBillingState(tenantId: string, state: LocalBillingState): LocalBillingState {

@@ -10,6 +10,13 @@ export type TenantSettings = {
   updatedAt?: string | null;
 };
 
+export type PlatformTenantSettingsSnapshot = {
+  tenantId: string;
+  tenantName: string;
+  dashboardNote: string;
+  updatedAt: string | null;
+};
+
 type TenantRow = {
   name: string;
   dashboard_note: string | null;
@@ -86,6 +93,17 @@ function loadFromLocalStore(base: TenantSettings): TenantSettings {
     dashboardNote: snapshot.dashboardNote || DEFAULT_DASHBOARD_NOTE,
     updatedAt: snapshot.updatedAt
   };
+}
+
+export function loadPlatformTenantSettingsFromLocalStore(): PlatformTenantSettingsSnapshot[] {
+  return [...getLocalTenantSettingsStore().entries()]
+    .map(([tenantId, snapshot]) => ({
+      tenantId,
+      tenantName: snapshot.tenantName,
+      dashboardNote: snapshot.dashboardNote,
+      updatedAt: snapshot.updatedAt
+    }))
+    .sort((left, right) => left.tenantName.localeCompare(right.tenantName));
 }
 
 function saveToLocalStore(settings: TenantSettings): TenantSettings {
