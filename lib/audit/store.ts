@@ -7,6 +7,7 @@ export type TenantAuditAction =
   | "tenant.settings.updated"
   | "team.invite.created"
   | "team.member.role_changed"
+  | "platform.member.role_changed"
   | "team.member.removed"
   | "team.ownership.transferred"
   | "billing.checkout.started"
