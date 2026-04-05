@@ -128,7 +128,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S45 - Platform-initiated tenant changes appear in tenant logs** [platform][security]
   - Tenant admins can see operator actions with reason metadata.
 
-- [ ] **S46 - Audit action details panel** [ui][app]
+- [x] **S46 - Audit action details panel** [ui][app]
   - User can open an event and see full action metadata.
 
 ---
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S45 - Platform-initiated tenant changes appear in tenant logs`
+- [x] Current active slice: `S46 - Audit action details panel`
 - [ ] Link PR/branch next to each completed slice.
