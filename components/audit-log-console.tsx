@@ -45,7 +45,8 @@ export function AuditLogConsole({ events }: AuditLogConsoleProps) {
         event.actorName,
         event.actorRole,
         event.targetLabel ?? "",
-        event.targetType ?? ""
+        event.targetType ?? "",
+        typeof event.metadata.reason === "string" ? event.metadata.reason : ""
       ]
         .join(" ")
         .toLowerCase();

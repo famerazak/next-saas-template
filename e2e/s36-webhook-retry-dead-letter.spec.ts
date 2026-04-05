@@ -65,10 +65,16 @@ test("S36: platform admin can inspect dead letters and retry failed delivery", a
     "Forced webhook handler failure for retry testing."
   );
 
+  await page
+    .getByTestId(/^platform-dead-letter-reason-input-/)
+    .first()
+    .fill("Stripe issue fixed and payload verified for replay.");
   const retryButton = page.getByTestId(/^platform-dead-letter-retry-/).first();
   await retryButton.click();
 
-  await expect(page.getByTestId("platform-webhook-success")).toContainText("Retried webhook evt_deadletter_retry_case.");
+  await expect(page.getByTestId("platform-webhook-success")).toContainText(
+    "Retried webhook evt_deadletter_retry_case for tenant-example."
+  );
   await expect(page.getByTestId("platform-webhook-pending-count")).toContainText("0 pending");
   await expect(page.getByTestId("platform-webhook-empty")).toBeVisible();
   await expect(page.getByTestId("platform-webhook-retry-history-list")).toContainText("evt_deadletter_retry_case");
