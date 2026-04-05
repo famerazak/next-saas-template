@@ -27,7 +27,7 @@ test("S36: non-platform user sees no-access UX on platform webhook jobs", async 
   await page.goto("/platform/webhooks-jobs");
 
   await expect(page.getByTestId("no-access-card")).toBeVisible();
-  await expect(page.getByText("Your role does not allow access to the platform webhook jobs area.")).toBeVisible();
+  await expect(page.getByText("Your role does not allow access to the platform operations area.")).toBeVisible();
 });
 
 test("S36: platform admin can inspect dead letters and retry failed delivery", async ({ page }) => {

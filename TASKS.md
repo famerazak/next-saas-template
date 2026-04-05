@@ -135,7 +135,7 @@ Each slice should ship something real a user can see/use.
 
 ## Slice 48-60: Platform Admin Area (`/platform/*`)
 
-- [ ] **S48 - Platform routes + nav visibility** [platform][security]
+- [x] **S48 - Platform routes + nav visibility** [platform][security]
   - `/platform/*` routes render only for `PlatformAdmin`.
 
 - [ ] **S49 - Platform dashboard + tenants list/detail** [platform][ui]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S46 - Audit action details panel`
+- [x] Current active slice: `S48 - Platform routes + nav visibility`
 - [ ] Link PR/branch next to each completed slice.
