@@ -141,7 +141,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S49 - Platform dashboard + tenants list/detail** [platform][ui]
   - Admin sees KPI cards, can search/filter tenants, and can open tenant detail with members and billing snapshot.
 
-- [ ] **S52 - Platform can edit tenant member roles** [platform][rbac]
+- [x] **S52 - Platform can edit tenant member roles** [platform][rbac]
   - Direct role-edit actions work from tenant detail and require a reason before privileged writes complete.
 
 - [ ] **S53 - Platform users page** [platform]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S49 - Platform dashboard + tenants list/detail`
+- [x] Current active slice: `S52 - Platform can edit tenant member roles`
 - [ ] Link PR/branch next to each completed slice.

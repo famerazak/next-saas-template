@@ -94,6 +94,47 @@ function normalizeEditableRole(value: string | null | undefined): EditableTeamRo
   }
 }
 
+async function loadTeamMembersForTenantFromDatabase(tenantId: string): Promise<TeamMember[]> {
+  const supabase = getServiceClient();
+  if (!supabase) {
+    return [];
+  }
+
+  const { data: memberships, error } = await supabase
+    .from("memberships")
+    .select("user_id, role")
+    .eq("tenant_id", tenantId)
+    .order("created_at", { ascending: true })
+    .returns<MembershipRow[]>();
+
+  if (error || !memberships || memberships.length === 0) {
+    return [];
+  }
+
+  return Promise.all(
+    memberships.map(async (membership) => {
+      try {
+        const result = await supabase.auth.admin.getUserById(membership.user_id);
+        return {
+          id: membership.user_id,
+          email: result.data.user?.email || membership.user_id,
+          fullName: ((result.data.user?.user_metadata?.full_name as string | undefined) ?? "").trim(),
+          role: normalizeRole(membership.role),
+          status: "Active" as const
+        };
+      } catch {
+        return {
+          id: membership.user_id,
+          email: membership.user_id,
+          fullName: "",
+          role: normalizeRole(membership.role),
+          status: "Active" as const
+        };
+      }
+    })
+  );
+}
+
 function fallbackMemberFromSession(session: AppSession): TeamMember[] {
   return [
     {
@@ -232,6 +273,35 @@ export async function loadTeamMembersForSession(session: AppSession): Promise<Te
   return users;
 }
 
+function updateMemberRoleForTenantInLocalStore(
+  tenantId: string,
+  targetUserId: string,
+  role: EditableTeamRole
+): { member: TeamMember; previousRole: TenantRole } {
+  const store = getLocalTeamStore();
+  const members = store.get(tenantId) ?? [];
+  const target = members.find((member) => member.id === targetUserId);
+
+  if (!target) {
+    throw new Error("Team member not found.");
+  }
+
+  if (target.role === "Owner") {
+    throw new Error("Owner role changes must use the ownership transfer flow.");
+  }
+
+  const updatedMember = { ...target, role };
+  store.set(
+    tenantId,
+    members.map((member) => (member.id === targetUserId ? updatedMember : member))
+  );
+
+  return {
+    member: updatedMember,
+    previousRole: target.role
+  };
+}
+
 function updateMemberRoleInLocalStore(
   session: AppSession,
   targetUserId: string,
@@ -316,6 +386,57 @@ export async function updateTeamMemberRoleForSession(
       ...target,
       role: normalizedRole
     },
+    persistedToDatabase: true
+  };
+}
+
+export async function updateTenantMemberRoleForPlatformAdmin(
+  tenantId: string,
+  targetUserId: string,
+  role: EditableTeamRole
+): Promise<{ member: TeamMember; previousRole: TenantRole; persistedToDatabase: boolean }> {
+  if (!tenantId) {
+    throw new Error("Tenant context is required.");
+  }
+
+  const normalizedRole = normalizeEditableRole(role);
+  const supabase = getServiceClient();
+  if (!supabase || process.env.E2E_AUTH_BYPASS === "1") {
+    return {
+      ...updateMemberRoleForTenantInLocalStore(tenantId, targetUserId, normalizedRole),
+      persistedToDatabase: false
+    };
+  }
+
+  const members = await loadTeamMembersForTenantFromDatabase(tenantId);
+  const target = members.find((member) => member.id === targetUserId);
+
+  if (!target) {
+    throw new Error("Team member not found.");
+  }
+
+  if (target.role === "Owner") {
+    throw new Error("Owner role changes must use the ownership transfer flow.");
+  }
+
+  const { error } = await supabase
+    .from("memberships")
+    .update({
+      role: normalizedRole.toLowerCase()
+    })
+    .eq("tenant_id", tenantId)
+    .eq("user_id", targetUserId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    member: {
+      ...target,
+      role: normalizedRole
+    },
+    previousRole: target.role,
     persistedToDatabase: true
   };
 }
