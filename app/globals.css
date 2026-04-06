@@ -352,6 +352,12 @@ body::before {
   padding: 1rem;
 }
 
+.tenant-file-actions {
+  display: grid;
+  gap: 0.7rem;
+  justify-items: end;
+}
+
 .tenant-file-row strong {
   color: #0f172a;
 }
@@ -467,7 +473,8 @@ body::before {
   }
 
   .tenant-file-row,
-  .tenant-file-meta {
+  .tenant-file-meta,
+  .tenant-file-actions {
     align-items: flex-start;
     flex-direction: column;
   }

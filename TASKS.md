@@ -163,7 +163,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S61 - File upload + tenant-scoped visibility** [storage][app]
   - User can upload a file, see it in a list, and only view files in the current tenant context.
 
-- [ ] **S63 - Signed download flow** [storage]
+- [x] **S63 - Signed download flow** [storage]
   - User can download file via signed URL.
 
 - [ ] **S64 - Delete file flow** [storage]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S61 - File upload + tenant-scoped visibility`
+- [x] Current active slice: `S63 - Signed download flow`
 - [ ] Link PR/branch next to each completed slice.

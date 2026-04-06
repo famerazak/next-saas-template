@@ -23,6 +23,7 @@ test("S61: tenant file uploads stay scoped to the current tenant", async ({ page
   await expect(page.getByTestId("sidebar-link-files")).toBeVisible();
   await page.goto("/files");
   await expect(page.getByTestId("tenant-files-page")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Download" })).toHaveCount(0);
   await page.getByTestId("tenant-files-input").setInputFiles({
     name: "alpha-brief.txt",
     mimeType: "text/plain",
@@ -60,6 +61,7 @@ test("S61: viewer can see tenant files but cannot upload new ones", async ({ pag
   await page.goto("/files");
   await expect(page.getByTestId("tenant-files-page")).toBeVisible();
   await expect(page.getByTestId("tenant-files-list")).toContainText("viewer-readme.txt");
+  await expect(page.getByRole("link", { name: "Download" })).toBeVisible();
   await expect(page.getByTestId("tenant-files-readonly-note")).toBeVisible();
   await expect(page.getByTestId("tenant-files-upload-form")).toHaveCount(0);
 });
