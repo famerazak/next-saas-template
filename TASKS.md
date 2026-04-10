@@ -166,7 +166,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S63 - Signed download flow** [storage]
   - User can download file via signed URL.
 
-- [ ] **S64 - Delete file flow** [storage]
+- [x] **S64 - Delete file flow** [storage]
   - Authorized user can delete file and it disappears from UI.
 
 - [ ] **S65 - Cookie consent banner** [analytics][ui]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S63 - Signed download flow`
+- [x] Current active slice: `S64 - Delete file flow`
 - [ ] Link PR/branch next to each completed slice.

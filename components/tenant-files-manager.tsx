@@ -4,7 +4,7 @@ import { useRef, useState, type FormEvent } from "react";
 import type { TenantFileRecord } from "@/lib/storage/store";
 
 type TenantFilesManagerProps = {
-  canUpload: boolean;
+  canManage: boolean;
   downloadUrls: Record<string, string>;
   roleLabel: string;
   tenantName: string;
@@ -13,6 +13,11 @@ type TenantFilesManagerProps = {
 
 type UploadResponse = {
   downloadUrl?: string;
+  error?: string;
+  file?: TenantFileRecord;
+};
+
+type DeleteResponse = {
   error?: string;
   file?: TenantFileRecord;
 };
@@ -40,7 +45,7 @@ function formatTimestamp(value: string): string {
 }
 
 export function TenantFilesManager({
-  canUpload,
+  canManage,
   downloadUrls,
   roleLabel,
   tenantName,
@@ -51,6 +56,7 @@ export function TenantFilesManager({
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   async function handleUpload(event: FormEvent<HTMLFormElement>) {
@@ -99,6 +105,39 @@ export function TenantFilesManager({
     }
   }
 
+  async function handleDelete(file: TenantFileRecord) {
+    setMessage("");
+    setError("");
+    setDeletingFileId(file.id);
+
+    const response = await fetch("/api/files", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        fileId: file.id
+      })
+    });
+
+    const payload = (await response.json().catch(() => null)) as DeleteResponse | null;
+    setDeletingFileId(null);
+
+    if (!response.ok || !payload?.file) {
+      setError(payload?.error ?? "Delete failed.");
+      return;
+    }
+
+    const deletedFile = payload.file;
+    setFiles((current) => current.filter((entry) => entry.id !== deletedFile.id));
+    setLinks((current) => {
+      const next = { ...current };
+      delete next[deletedFile.id];
+      return next;
+    });
+    setMessage(`${deletedFile.fileName} deleted successfully.`);
+  }
+
   return (
     <section className="auth-card settings-card tenant-files-card" data-testid="tenant-files-page">
       <div className="settings-header">
@@ -121,12 +160,12 @@ export function TenantFilesManager({
         </article>
         <article className="platform-kpi-card" data-testid="tenant-files-upload-policy">
           <span className="settings-label">Upload policy</span>
-          <strong>{canUpload ? "Enabled" : "Read only"}</strong>
-          <p>Uploads are capped at 2 MB so the starter stays lightweight.</p>
+          <strong>{canManage ? "Enabled" : "Read only"}</strong>
+          <p>Uploads and deletes are capped to non-viewer roles so shared files stay controlled.</p>
         </article>
       </div>
 
-      {canUpload ? (
+      {canManage ? (
         <form className="tenant-files-upload-form" onSubmit={handleUpload} data-testid="tenant-files-upload-form">
           <label htmlFor="tenant-files-input">
             Upload file
@@ -149,7 +188,7 @@ export function TenantFilesManager({
         </form>
       ) : (
         <div className="tenant-files-readonly-note" data-testid="tenant-files-readonly-note">
-          You can review files in this tenant, but only Owner, Admin, and Member roles can upload new ones.
+          You can review files in this tenant, but only Owner, Admin, and Member roles can upload or delete files.
         </div>
       )}
 
@@ -185,6 +224,17 @@ export function TenantFilesManager({
                 >
                   Download
                 </a>
+                {canManage ? (
+                  <button
+                    type="button"
+                    className="tenant-file-delete-button"
+                    data-testid={`tenant-file-delete-${file.id}`}
+                    disabled={deletingFileId === file.id}
+                    onClick={() => void handleDelete(file)}
+                  >
+                    {deletingFileId === file.id ? "Deleting..." : "Delete"}
+                  </button>
+                ) : null}
               </div>
             </article>
           ))

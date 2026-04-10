@@ -358,6 +358,11 @@ body::before {
   justify-items: end;
 }
 
+.tenant-file-actions > a,
+.tenant-file-actions > button {
+  min-width: 7.5rem;
+}
+
 .tenant-file-row strong {
   color: #0f172a;
 }
@@ -381,6 +386,26 @@ body::before {
   color: #475569;
   font-size: 0.84rem;
   padding: 0.32rem 0.6rem;
+}
+
+.tenant-file-delete-button {
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  border-radius: 999px;
+  background: rgba(254, 242, 242, 0.96);
+  color: #b91c1c;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.72rem 1rem;
+}
+
+.tenant-file-delete-button:hover:not(:disabled) {
+  background: rgba(254, 226, 226, 0.98);
+}
+
+.tenant-file-delete-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .platform-compliance-layout {

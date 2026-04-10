@@ -15,7 +15,8 @@ export type TenantAuditAction =
   | "platform.webhook.retry"
   | "platform.billing.adjusted"
   | "platform.support.updated"
-  | "platform.flags.updated";
+  | "platform.flags.updated"
+  | "files.deleted";
 
 export type TenantAuditMetadata = Record<string, string | number | boolean | null>;
 

@@ -114,6 +114,23 @@ function writeLocalFile(file: StoredTenantFile): TenantFileRecord {
   return record;
 }
 
+function deleteLocalFile(tenantId: string, fileId: string): TenantFileRecord | null {
+  const store = getLocalTenantFileStore();
+  const existing = store.get(tenantId) ?? [];
+  const target = existing.find((entry) => entry.id === fileId) ?? null;
+  if (!target) {
+    return null;
+  }
+
+  store.set(
+    tenantId,
+    existing.filter((entry) => entry.id !== fileId)
+  );
+
+  const { contentBase64: _contentBase64, ...record } = target;
+  return record;
+}
+
 function loadLocalFileForDownload(tenantId: string, fileId: string): TenantFileDownloadRecord | null {
   const stored = (getLocalTenantFileStore().get(tenantId) ?? []).find((entry) => entry.id === fileId);
   if (!stored) {
@@ -225,4 +242,39 @@ export async function loadTenantFileForDownload(tenantId: string, fileId: string
   }
 
   return toDownloadRecord(data);
+}
+
+export async function deleteTenantFileForSession(session: AppSession, fileId: string): Promise<TenantFileRecord> {
+  if (!session.tenantId) {
+    throw new Error("Tenant context is required before deleting files.");
+  }
+
+  const supabase = getServiceClient();
+  if (!supabase) {
+    const deleted = deleteLocalFile(session.tenantId, fileId);
+    if (!deleted) {
+      throw new Error("File not found in this tenant.");
+    }
+
+    return deleted;
+  }
+
+  const { data, error } = await supabase
+    .from("tenant_files")
+    .delete()
+    .eq("tenant_id", session.tenantId)
+    .eq("id", fileId)
+    .select("id, tenant_id, file_name, mime_type, size_bytes, content_base64, uploaded_by_user_id, uploaded_by_email, created_at")
+    .maybeSingle<TenantFileRow>();
+
+  if (!error && data) {
+    return toRecord(data);
+  }
+
+  const deleted = deleteLocalFile(session.tenantId, fileId);
+  if (deleted) {
+    return deleted;
+  }
+
+  throw new Error("File not found in this tenant.");
 }

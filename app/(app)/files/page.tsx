@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { TenantFilesManager } from "@/components/tenant-files-manager";
-import { canUploadTenantFiles } from "@/lib/auth/authorization";
+import { canManageTenantFiles } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
 import { buildSignedDownloadUrl } from "@/lib/storage/signed-download";
 import { loadTenantFilesForSession } from "@/lib/storage/store";
@@ -25,7 +25,7 @@ export default async function FilesPage() {
   return (
     <main className="page-shell">
       <TenantFilesManager
-        canUpload={canUploadTenantFiles(session)}
+        canManage={canManageTenantFiles(session)}
         downloadUrls={downloadUrls}
         roleLabel={session.role ?? "Member"}
         tenantName={session.tenantName ?? "Workspace"}

@@ -24,7 +24,7 @@ const PERMISSION_ROWS: PermissionRow[] = [
     admin: "Full access",
     member: "Full access",
     viewer: "Read only",
-    note: "All signed-in users can see tenant files. Viewer stays read-only while other roles can upload."
+    note: "All signed-in users can see tenant files. Viewer stays read-only while other roles can upload and delete."
   },
   {
     capability: "Tenant settings",
