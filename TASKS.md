@@ -169,7 +169,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S64 - Delete file flow** [storage]
   - Authorized user can delete file and it disappears from UI.
 
-- [ ] **S65 - Cookie consent banner** [analytics][ui]
+- [x] **S65 - Cookie consent banner** [analytics][ui]
   - User can accept/reject analytics cookies in visible banner.
 
 - [ ] **S66 - GA gated by consent state** [analytics]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S64 - Delete file flow`
+- [x] Current active slice: `S65 - Cookie consent banner`
 - [ ] Link PR/branch next to each completed slice.
