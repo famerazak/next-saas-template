@@ -1,4 +1,5 @@
 export const ANALYTICS_CONSENT_COOKIE = "analytics_consent";
+export const ANALYTICS_CONSENT_EVENT = "analytics-consent-changed";
 
 export type AnalyticsConsentState = "unknown" | "accepted" | "rejected";
 
