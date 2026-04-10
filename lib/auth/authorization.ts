@@ -18,8 +18,12 @@ export function canWriteCoreApp(session: AppSession): boolean {
   return TENANT_ADMIN_ROLES.has(session.role ?? "Member");
 }
 
-export function canUploadTenantFiles(session: AppSession): boolean {
+export function canManageTenantFiles(session: AppSession): boolean {
   return (session.role ?? "Member") !== "Viewer";
+}
+
+export function canUploadTenantFiles(session: AppSession): boolean {
+  return canManageTenantFiles(session);
 }
 
 export function canAccessPlatformAdminArea(session: AppSession): boolean {

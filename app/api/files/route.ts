@@ -1,11 +1,16 @@
 import { Buffer } from "node:buffer";
 import { NextResponse } from "next/server";
-import { canUploadTenantFiles } from "@/lib/auth/authorization";
+import { recordTenantAuditEventForSession } from "@/lib/audit/store";
+import { canManageTenantFiles, canUploadTenantFiles } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
 import { buildSignedDownloadUrl } from "@/lib/storage/signed-download";
-import { uploadTenantFileForSession } from "@/lib/storage/store";
+import { deleteTenantFileForSession, uploadTenantFileForSession } from "@/lib/storage/store";
 
 const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
+
+type DeleteFileRequest = {
+  fileId?: string;
+};
 
 export async function POST(request: Request) {
   const session = await getAppSessionFromCookies();
@@ -55,4 +60,48 @@ export async function POST(request: Request) {
     },
     { status: 201 }
   );
+}
+
+export async function DELETE(request: Request) {
+  const session = await getAppSessionFromCookies();
+  if (!session) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
+
+  if (!canManageTenantFiles(session)) {
+    return NextResponse.json({ error: "Your role can review files but cannot delete them." }, { status: 403 });
+  }
+
+  let body: DeleteFileRequest;
+  try {
+    body = (await request.json()) as DeleteFileRequest;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON payload." }, { status: 400 });
+  }
+
+  const fileId = typeof body.fileId === "string" ? body.fileId.trim() : "";
+  if (!fileId) {
+    return NextResponse.json({ error: "File id is required." }, { status: 400 });
+  }
+
+  try {
+    const deleted = await deleteTenantFileForSession(session, fileId);
+    await recordTenantAuditEventForSession(session, {
+      action: "files.deleted",
+      summary: `Deleted ${deleted.fileName} from tenant files.`,
+      targetType: "file",
+      targetId: deleted.id,
+      targetLabel: deleted.fileName,
+      metadata: {
+        mimeType: deleted.mimeType,
+        sizeBytes: deleted.sizeBytes
+      }
+    });
+    return NextResponse.json({ file: deleted }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Could not delete file." },
+      { status: 400 }
+    );
+  }
 }
