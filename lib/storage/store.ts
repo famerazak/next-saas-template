@@ -36,6 +36,10 @@ type TenantFileUploadInput = {
   contentBase64: string;
 };
 
+export type TenantFileDownloadRecord = TenantFileRecord & {
+  contentBase64: string;
+};
+
 type LocalTenantFileStore = Map<string, StoredTenantFile[]>;
 
 declare global {
@@ -85,6 +89,13 @@ function toRecord(row: TenantFileRow): TenantFileRecord {
   };
 }
 
+function toDownloadRecord(row: TenantFileRow): TenantFileDownloadRecord {
+  return {
+    ...toRecord(row),
+    contentBase64: row.content_base64
+  };
+}
+
 function readLocalFiles(tenantId: string): TenantFileRecord[] {
   return (getLocalTenantFileStore().get(tenantId) ?? []).map(({ contentBase64: _contentBase64, ...record }) => record);
 }
@@ -101,6 +112,25 @@ function writeLocalFile(file: StoredTenantFile): TenantFileRecord {
 
   const { contentBase64: _contentBase64, ...record } = file;
   return record;
+}
+
+function loadLocalFileForDownload(tenantId: string, fileId: string): TenantFileDownloadRecord | null {
+  const stored = (getLocalTenantFileStore().get(tenantId) ?? []).find((entry) => entry.id === fileId);
+  if (!stored) {
+    return null;
+  }
+
+  return {
+    id: stored.id,
+    tenantId: stored.tenantId,
+    fileName: stored.fileName,
+    mimeType: stored.mimeType,
+    sizeBytes: stored.sizeBytes,
+    contentBase64: stored.contentBase64,
+    uploadedByUserId: stored.uploadedByUserId,
+    uploadedByEmail: stored.uploadedByEmail,
+    createdAt: stored.createdAt
+  };
 }
 
 export async function loadTenantFilesForSession(session: AppSession): Promise<TenantFileRecord[]> {
@@ -173,4 +203,26 @@ export async function uploadTenantFileForSession(
   }
 
   return toRecord(data);
+}
+
+export async function loadTenantFileForDownload(tenantId: string, fileId: string): Promise<TenantFileDownloadRecord | null> {
+  const supabase = getServiceClient();
+  if (!supabase) {
+    return loadLocalFileForDownload(tenantId, fileId);
+  }
+
+  const { data, error } = await supabase
+    .from("tenant_files")
+    .select(
+      "id, tenant_id, file_name, mime_type, size_bytes, content_base64, uploaded_by_user_id, uploaded_by_email, created_at"
+    )
+    .eq("tenant_id", tenantId)
+    .eq("id", fileId)
+    .maybeSingle<TenantFileRow>();
+
+  if (error || !data) {
+    return loadLocalFileForDownload(tenantId, fileId);
+  }
+
+  return toDownloadRecord(data);
 }

@@ -2,6 +2,7 @@ import { Buffer } from "node:buffer";
 import { NextResponse } from "next/server";
 import { canUploadTenantFiles } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
+import { buildSignedDownloadUrl } from "@/lib/storage/signed-download";
 import { uploadTenantFileForSession } from "@/lib/storage/store";
 
 const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
@@ -44,5 +45,14 @@ export async function POST(request: Request) {
     contentBase64
   });
 
-  return NextResponse.json({ file: uploaded }, { status: 201 });
+  return NextResponse.json(
+    {
+      file: uploaded,
+      downloadUrl: buildSignedDownloadUrl({
+        fileId: uploaded.id,
+        tenantId: uploaded.tenantId
+      })
+    },
+    { status: 201 }
+  );
 }

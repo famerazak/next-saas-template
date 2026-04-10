@@ -5,12 +5,14 @@ import type { TenantFileRecord } from "@/lib/storage/store";
 
 type TenantFilesManagerProps = {
   canUpload: boolean;
+  downloadUrls: Record<string, string>;
   roleLabel: string;
   tenantName: string;
   initialFiles: TenantFileRecord[];
 };
 
 type UploadResponse = {
+  downloadUrl?: string;
   error?: string;
   file?: TenantFileRecord;
 };
@@ -37,8 +39,15 @@ function formatTimestamp(value: string): string {
   }).format(new Date(value));
 }
 
-export function TenantFilesManager({ canUpload, roleLabel, tenantName, initialFiles }: TenantFilesManagerProps) {
+export function TenantFilesManager({
+  canUpload,
+  downloadUrls,
+  roleLabel,
+  tenantName,
+  initialFiles
+}: TenantFilesManagerProps) {
   const [files, setFiles] = useState(initialFiles);
+  const [links, setLinks] = useState(downloadUrls);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isUploading, setIsUploading] = useState(false);
@@ -68,16 +77,23 @@ export function TenantFilesManager({ canUpload, roleLabel, tenantName, initialFi
     const payload = (await response.json().catch(() => null)) as UploadResponse | null;
     setIsUploading(false);
 
-    if (!response.ok || !payload?.file) {
+    if (!response.ok || !payload?.file || !payload.downloadUrl) {
       setError(payload?.error ?? "Upload failed.");
       return;
     }
 
+    const uploadedFile = payload.file;
+    const downloadUrl = payload.downloadUrl;
+
     setFiles((current) => [
-      payload.file as TenantFileRecord,
-      ...current.filter((entry) => entry.id !== payload.file?.id)
+      uploadedFile,
+      ...current.filter((entry) => entry.id !== uploadedFile.id)
     ]);
-    setMessage(`${payload.file.fileName} uploaded successfully.`);
+    setLinks((current) => ({
+      ...current,
+      [uploadedFile.id]: downloadUrl
+    }));
+    setMessage(`${uploadedFile.fileName} uploaded successfully.`);
     if (inputRef.current) {
       inputRef.current.value = "";
     }
@@ -156,10 +172,19 @@ export function TenantFilesManager({ canUpload, roleLabel, tenantName, initialFi
                 <strong>{file.fileName}</strong>
                 <p>{file.mimeType}</p>
               </div>
-              <div className="tenant-file-meta">
-                <span>{formatBytes(file.sizeBytes)}</span>
-                <span>{file.uploadedByEmail}</span>
-                <span>{formatTimestamp(file.createdAt)}</span>
+              <div className="tenant-file-actions">
+                <div className="tenant-file-meta">
+                  <span>{formatBytes(file.sizeBytes)}</span>
+                  <span>{file.uploadedByEmail}</span>
+                  <span>{formatTimestamp(file.createdAt)}</span>
+                </div>
+                <a
+                  href={links[file.id]}
+                  className="audit-log-details-button"
+                  data-testid={`tenant-file-download-${file.id}`}
+                >
+                  Download
+                </a>
               </div>
             </article>
           ))
