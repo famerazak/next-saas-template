@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { recordTenantAuditEventForSession } from "@/lib/audit/store";
 import { canAccessTenantAdminArea } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
+import { consumeRateLimit, getRequestIp } from "@/lib/rate-limit";
 import { createInviteForSession, type InvitableRole } from "@/lib/team/invites";
 
 type InviteMemberRequest = {
@@ -10,6 +11,8 @@ type InviteMemberRequest = {
 };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const INVITE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const INVITE_LIMIT_MAX_ATTEMPTS = 5;
 
 function parseEmail(value: unknown): string | null {
   if (typeof value !== "string") {
@@ -65,6 +68,23 @@ export async function POST(request: Request) {
       { error: "Invite email and role are required. Role must be Admin, Member, or Viewer." },
       { status: 400 }
     );
+  }
+
+  const rateLimited = consumeRateLimit(
+    "team-invite",
+    `${session.tenantId ?? session.userId}:${session.userId}:${getRequestIp(request)}`,
+    {
+      maxAttempts: INVITE_LIMIT_MAX_ATTEMPTS,
+      windowMs: INVITE_LIMIT_WINDOW_MS,
+      cooldownMs: INVITE_LIMIT_WINDOW_MS,
+      actionLabel: "team invite"
+    }
+  );
+  if (rateLimited) {
+    return NextResponse.json(rateLimited, {
+      status: 429,
+      headers: { "Retry-After": String(rateLimited.retryAfterSeconds) }
+    });
   }
 
   try {

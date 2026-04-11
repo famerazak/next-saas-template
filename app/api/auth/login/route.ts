@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 import {
   checkLoginAbuse,
   clearFailedLogins,
-  getRequestIp,
   normalizeProviderAuthAbuse,
   recordFailedLogin
 } from "@/lib/auth/abuse";
+import { getRequestIp } from "@/lib/rate-limit";
 import { createActiveSession } from "@/lib/auth/session-registry";
 import { clearAppSession, clearPreAuthChallenge, setAppSession, setPreAuthChallenge } from "@/lib/auth/session";
 import { loadProfileForUser } from "@/lib/profile/store";

@@ -1,3 +1,5 @@
+import { buildRateLimitedPayload, formatRateLimitMessage as formatGenericRateLimitMessage, getRequestIp } from "@/lib/rate-limit";
+
 export type AuthAbuseCode = "rate_limited" | "captcha_required";
 
 export type AuthAbusePayload = {
@@ -68,15 +70,6 @@ function getRecord(key: string, windowMs: number): AbuseRecord {
   return existing;
 }
 
-export function getRequestIp(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0]?.trim() || "unknown";
-  }
-
-  return request.headers.get("x-real-ip") ?? "unknown";
-}
-
 export function checkLoginAbuse(identifier: string): AuthAbusePayload | null {
   const key = normalizeKey("login", identifier);
   const record = getRecord(key, LOGIN_WINDOW_MS);
@@ -86,7 +79,7 @@ export function checkLoginAbuse(identifier: string): AuthAbusePayload | null {
     return null;
   }
 
-  return buildRateLimitedPayload(Math.ceil((record.blockedUntil - now) / 1000));
+  return buildAuthRateLimitedPayload(Math.ceil((record.blockedUntil - now) / 1000));
 }
 
 export function recordFailedLogin(identifier: string): AuthAbusePayload | null {
@@ -95,13 +88,13 @@ export function recordFailedLogin(identifier: string): AuthAbusePayload | null {
   const now = Date.now();
 
   if (record.blockedUntil && record.blockedUntil > now) {
-    return buildRateLimitedPayload(Math.ceil((record.blockedUntil - now) / 1000));
+    return buildAuthRateLimitedPayload(Math.ceil((record.blockedUntil - now) / 1000));
   }
 
   record.count += 1;
   if (record.count >= LOGIN_MAX_FAILURES) {
     record.blockedUntil = now + LOGIN_COOLDOWN_MS;
-    return buildRateLimitedPayload(Math.ceil(LOGIN_COOLDOWN_MS / 1000));
+    return buildAuthRateLimitedPayload(Math.ceil(LOGIN_COOLDOWN_MS / 1000));
   }
 
   getStore().set(key, record);
@@ -112,7 +105,7 @@ export function clearFailedLogins(identifier: string) {
   getStore().delete(normalizeKey("login", identifier));
 }
 
-export function buildRateLimitedPayload(retryAfterSeconds: number): AuthAbusePayload {
+export function buildAuthRateLimitedPayload(retryAfterSeconds: number): AuthAbusePayload {
   return {
     code: "rate_limited",
     retryAfterSeconds,
@@ -130,7 +123,7 @@ export function normalizeProviderAuthAbuse(error: {
   const code = error.code?.toLowerCase() ?? "";
 
   if (error.status === 429 || message.includes("rate limit") || message.includes("too many")) {
-    return buildRateLimitedPayload(600);
+    return buildAuthRateLimitedPayload(600);
   }
 
   if (
@@ -153,10 +146,14 @@ export function formatAuthAbuseMessage(
   fallback: string
 ): string {
   if (payload.code === "rate_limited") {
-    if (typeof payload.retryAfterSeconds === "number") {
-      return `Too many attempts. Try again in ${formatRetryWindow(payload.retryAfterSeconds)}.`;
-    }
-    return payload.error || "Too many attempts. Please wait a moment before trying again.";
+    return formatGenericRateLimitMessage(
+      {
+        code: "rate_limited",
+        error: payload.error,
+        retryAfterSeconds: payload.retryAfterSeconds
+      },
+      fallback
+    );
   }
 
   if (payload.code === "captcha_required") {

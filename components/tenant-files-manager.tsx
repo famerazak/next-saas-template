@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
+import { formatRateLimitMessage } from "@/lib/rate-limit";
 import type { TenantFileRecord } from "@/lib/storage/store";
 
 type TenantFilesManagerProps = {
@@ -84,7 +85,7 @@ export function TenantFilesManager({
     setIsUploading(false);
 
     if (!response.ok || !payload?.file || !payload.downloadUrl) {
-      setError(payload?.error ?? "Upload failed.");
+      setError(formatRateLimitMessage(payload ?? {}, "Upload failed."));
       return;
     }
 
