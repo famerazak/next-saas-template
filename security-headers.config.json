@@ -1,0 +1,60 @@
+[
+  {
+    "id": "browser-pages",
+    "label": "Browser pages",
+    "summary": "Public and signed-in pages emit baseline clickjacking, MIME sniffing, referrer, permissions, and CSP protections.",
+    "matcher": "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "samplePath": "/privacy",
+    "headers": [
+      {
+        "key": "Content-Security-Policy",
+        "value": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: blob: https:; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' ws: wss: https://*.supabase.co https://www.google-analytics.com https://region1.google-analytics.com; font-src 'self' data:"
+      },
+      {
+        "key": "Referrer-Policy",
+        "value": "strict-origin-when-cross-origin"
+      },
+      {
+        "key": "X-Frame-Options",
+        "value": "DENY"
+      },
+      {
+        "key": "X-Content-Type-Options",
+        "value": "nosniff"
+      },
+      {
+        "key": "Permissions-Policy",
+        "value": "camera=(), microphone=(), geolocation=()"
+      }
+    ]
+  },
+  {
+    "id": "api-routes",
+    "label": "API routes",
+    "summary": "JSON endpoints return the same anti-clickjacking and referrer protections, plus a locked-down CSP for API responses.",
+    "matcher": "/api/:path*",
+    "samplePath": "/api/auth/login",
+    "headers": [
+      {
+        "key": "Content-Security-Policy",
+        "value": "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+      },
+      {
+        "key": "Referrer-Policy",
+        "value": "strict-origin-when-cross-origin"
+      },
+      {
+        "key": "X-Frame-Options",
+        "value": "DENY"
+      },
+      {
+        "key": "X-Content-Type-Options",
+        "value": "nosniff"
+      },
+      {
+        "key": "Permissions-Policy",
+        "value": "camera=(), microphone=(), geolocation=()"
+      }
+    ]
+  }
+]

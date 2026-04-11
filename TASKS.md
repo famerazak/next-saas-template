@@ -178,7 +178,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S67 - Legal pages published** [app]
   - `/privacy`, `/terms`, and placeholder compliance pages accessible.
 
-- [ ] **S68 - Error tracking + security header diagnostics surface** [platform][security]
+- [x] **S68 - Error tracking + security header diagnostics surface** [platform][security]
   - New app errors appear in platform diagnostics and operators can verify header/CSP status from an in-app diagnostic surface.
 
 - [ ] **S70 - Auth + critical endpoint rate-limit UX** [security][auth]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S67 - Legal pages published`
+- [x] Current active slice: `S68 - Error tracking + security header diagnostics surface`
 - [ ] Link PR/branch next to each completed slice.

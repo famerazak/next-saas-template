@@ -3,6 +3,7 @@ import { recordTenantAuditEventForSession } from "@/lib/audit/store";
 import { canAccessPlatformAdminArea } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
 import { loadPlatformWebhookJobsSnapshot, retryWebhookDeadLetter } from "@/lib/billing/store";
+import { recordPlatformAppError } from "@/lib/platform/errors";
 
 type RetryWebhookRequest = {
   deadLetterId?: string;
@@ -66,6 +67,16 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error) {
+    await recordPlatformAppError({
+      source: "platform.webhook-retry",
+      route: "/api/platform/webhooks/retry",
+      message: error instanceof Error ? error.message : "Could not retry webhook delivery.",
+      metadata: {
+        actorEmail: session.email,
+        deadLetterId,
+        reason
+      }
+    });
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Could not retry webhook delivery." },
       { status: 400 }

@@ -311,6 +311,20 @@ export function PlatformDashboard({ adminEmail, snapshot }: PlatformDashboardPro
             Open users directory
           </Link>
         </article>
+        <article className="platform-quick-item" data-testid="platform-home-card-diagnostics">
+          <div>
+            <span className="settings-label">Diagnostics</span>
+            <strong>Error and header signals</strong>
+            <p>Inspect recent app errors and verify the configured security-header and CSP baseline in one place.</p>
+          </div>
+          <Link
+            href="/platform/diagnostics"
+            className="audit-log-details-button"
+            data-testid="platform-home-link-diagnostics"
+          >
+            Open diagnostics
+          </Link>
+        </article>
       </div>
 
         <div className="platform-toolbar" data-testid="platform-tenant-toolbar">
