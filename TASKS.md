@@ -172,7 +172,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S65 - Cookie consent banner** [analytics][ui]
   - User can accept/reject analytics cookies in visible banner.
 
-- [ ] **S66 - GA gated by consent state** [analytics]
+- [x] **S66 - GA gated by consent state** [analytics]
   - Analytics activates only when consent allows.
 
 - [ ] **S67 - Legal pages published** [app]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S65 - Cookie consent banner`
+- [x] Current active slice: `S66 - GA gated by consent state`
 - [ ] Link PR/branch next to each completed slice.

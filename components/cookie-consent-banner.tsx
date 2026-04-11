@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import {
+  ANALYTICS_CONSENT_EVENT,
   buildAnalyticsConsentCookieValue,
   type AnalyticsConsentState
 } from "@/lib/analytics/consent";
@@ -19,6 +20,13 @@ export function CookieConsentBanner({ initialConsent }: CookieConsentBannerProps
 
   function applyConsent(nextConsent: Exclude<AnalyticsConsentState, "unknown">) {
     document.cookie = buildAnalyticsConsentCookieValue(nextConsent);
+    window.dispatchEvent(
+      new CustomEvent(ANALYTICS_CONSENT_EVENT, {
+        detail: {
+          consent: nextConsent
+        }
+      })
+    );
     setConsent(nextConsent);
   }
 
