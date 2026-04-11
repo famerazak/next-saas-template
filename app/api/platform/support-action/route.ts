@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { recordTenantAuditEventForSession } from "@/lib/audit/store";
 import { canAccessPlatformAdminArea } from "@/lib/auth/authorization";
 import { getAppSessionFromCookies } from "@/lib/auth/session";
+import { recordPlatformAppError } from "@/lib/platform/errors";
 import {
   hasKnownPlatformBillingSupportTenant,
   loadPlatformBillingSupportSnapshot,
@@ -115,6 +116,16 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error) {
+    await recordPlatformAppError({
+      source: "platform.support-action",
+      route: "/api/platform/support-action",
+      message: error instanceof Error ? error.message : "Could not save support action.",
+      metadata: {
+        actorEmail: session.email,
+        tenantId,
+        ticketId
+      }
+    });
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Could not save support action." },
       { status: 400 }

@@ -586,10 +586,62 @@ body::before {
   font-size: 0.9rem;
 }
 
+.button-secondary {
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  border-radius: 999px;
+  background: rgba(239, 246, 255, 0.96);
+  color: #1d4ed8;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.72rem 1rem;
+}
+
+.button-secondary:hover:not(:disabled) {
+  background: rgba(219, 234, 254, 0.98);
+}
+
+.button-secondary:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.platform-diagnostics-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.platform-diagnostics-header-values {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.75rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.platform-diagnostics-header-values li {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.platform-diagnostics-header-values strong {
+  display: block;
+  color: #0f172a;
+  margin-bottom: 0.12rem;
+}
+
+.platform-diagnostics-header-values code,
+.platform-compliance-row code {
+  word-break: break-word;
+  color: #0f172a;
+}
+
 @media (max-width: 880px) {
   .platform-settings-layout,
   .platform-settings-tenant-layout,
   .platform-compliance-layout,
+  .platform-diagnostics-layout,
   .platform-ops-form-grid,
   .tenant-files-upload-form {
     grid-template-columns: 1fr;
