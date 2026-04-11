@@ -187,7 +187,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S71 - Environment/config validation failure UX** [security][infra]
   - Startup/config issues surface clearly for operators.
 
-- [ ] **S72 - “Starter ready” smoke flow** [app][ui]
+- [x] **S72 - “Starter ready” smoke flow** [app][ui]
   - End-to-end happy path demo works:
     - create account
     - create tenant
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S71 - Environment/config validation failure UX`
+- [x] Current active slice: `S72 - “Starter ready” smoke flow`
 - [ ] Link PR/branch next to each completed slice.
