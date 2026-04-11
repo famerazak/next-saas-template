@@ -1,4 +1,8 @@
 import securityHeaderProfilesJson from "@/security-headers.config.json";
+import {
+  loadPlatformConfigDiagnosticsSnapshot,
+  type PlatformConfigDiagnostic
+} from "@/lib/platform/config-diagnostics";
 import { loadPlatformAppErrors, type PlatformAppErrorRecord } from "@/lib/platform/errors";
 
 type SecurityHeaderDefinition = {
@@ -30,10 +34,13 @@ export type PlatformHeaderDiagnostic = {
 export type PlatformDiagnosticsSnapshot = {
   errors: PlatformAppErrorRecord[];
   headerDiagnostics: PlatformHeaderDiagnostic[];
+  configDiagnostics: PlatformConfigDiagnostic[];
   errorCount: number;
   repeatedErrorCount: number;
   cspProtectedSurfaceCount: number;
   unhealthySurfaceCount: number;
+  configIssueCount: number;
+  configStarterModeCount: number;
 };
 
 const securityHeaderProfiles = securityHeaderProfilesJson as SecurityHeaderProfileConfig[];
@@ -44,6 +51,7 @@ function hasCsp(headers: SecurityHeaderDefinition[]) {
 
 export async function loadPlatformDiagnosticsSnapshot(): Promise<PlatformDiagnosticsSnapshot> {
   const errors = await loadPlatformAppErrors({ limit: 20 });
+  const configDiagnostics = loadPlatformConfigDiagnosticsSnapshot();
   const headerDiagnostics = securityHeaderProfiles.map((profile) => {
     const cspStatus = hasCsp(profile.headers) ? "Configured" : "Missing";
 
@@ -58,9 +66,12 @@ export async function loadPlatformDiagnosticsSnapshot(): Promise<PlatformDiagnos
   return {
     errors,
     headerDiagnostics,
+    configDiagnostics: configDiagnostics.checks,
     errorCount: errors.length,
     repeatedErrorCount: errors.filter((error) => error.occurrenceCount > 1).length,
     cspProtectedSurfaceCount: headerDiagnostics.filter((profile) => profile.cspStatus === "Configured").length,
-    unhealthySurfaceCount: headerDiagnostics.filter((profile) => profile.status === "Needs attention").length
+    unhealthySurfaceCount: headerDiagnostics.filter((profile) => profile.status === "Needs attention").length,
+    configIssueCount: configDiagnostics.issueCount,
+    configStarterModeCount: configDiagnostics.starterModeCount
   };
 }

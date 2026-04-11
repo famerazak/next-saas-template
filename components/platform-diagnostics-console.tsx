@@ -81,6 +81,11 @@ export function PlatformDiagnosticsConsole({ adminEmail, snapshot }: PlatformDia
           <strong>{repeatedErrorCount}</strong>
           <p>Errors seen more than once and worth triaging first.</p>
         </article>
+        <article className="platform-kpi-card" data-testid="platform-diagnostics-config-issues-count">
+          <span className="settings-label">Config issues</span>
+          <strong>{snapshot.configIssueCount}</strong>
+          <p>Missing or fallback environment settings that still need operator attention.</p>
+        </article>
         <article className="platform-kpi-card" data-testid="platform-diagnostics-csp-count">
           <span className="settings-label">CSP covered</span>
           <strong>{snapshot.cspProtectedSurfaceCount}</strong>
@@ -203,6 +208,50 @@ export function PlatformDiagnosticsConsole({ adminEmail, snapshot }: PlatformDia
           </div>
         </section>
       </div>
+
+      <section className="platform-tenant-detail-card" data-testid="platform-diagnostics-config-feed">
+        <div className="platform-tenant-detail-section-header">
+          <div>
+            <h2>Environment and config health</h2>
+            <p>
+              Operator-facing startup and integration checks for auth, storage, analytics, and webhook configuration.
+            </p>
+          </div>
+          <span className="security-status-badge is-neutral" data-testid="platform-diagnostics-config-summary">
+            {snapshot.configIssueCount} issues · {snapshot.configStarterModeCount} starter-mode checks
+          </span>
+        </div>
+
+        <div className="platform-compliance-list" data-testid="platform-diagnostics-config-list">
+          {snapshot.configDiagnostics.map((check) => (
+            <article
+              className="platform-compliance-row"
+              key={check.id}
+              data-testid={`platform-diagnostics-config-${check.id}`}
+            >
+              <div>
+                <div className="platform-compliance-row-heading">
+                  <strong>{check.label}</strong>
+                  <span
+                    className={`security-status-badge ${
+                      check.status === "Healthy"
+                        ? "is-good"
+                        : check.status === "Starter mode"
+                          ? "is-neutral"
+                          : "is-pending"
+                    }`}
+                  >
+                    {check.status}
+                  </span>
+                </div>
+                <p>{check.summary}</p>
+                <p>{check.operatorAction}</p>
+                <p>Env vars: {check.envVars.join(", ")}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
     </section>
   );
 }

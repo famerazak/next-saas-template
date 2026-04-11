@@ -184,7 +184,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S70 - Auth + critical endpoint rate-limit UX** [security][auth]
   - End users get usable response when hitting rate limits.
 
-- [ ] **S71 - Environment/config validation failure UX** [security][infra]
+- [x] **S71 - Environment/config validation failure UX** [security][infra]
   - Startup/config issues surface clearly for operators.
 
 - [ ] **S72 - “Starter ready” smoke flow** [app][ui]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S70 - Auth + critical endpoint rate-limit UX`
+- [x] Current active slice: `S71 - Environment/config validation failure UX`
 - [ ] Link PR/branch next to each completed slice.
