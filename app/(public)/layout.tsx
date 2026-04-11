@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PublicLegalFooter } from "@/components/public-legal-footer";
 import { PublicSiteHeader } from "@/components/site-nav";
 
 type PublicLayoutProps = {
@@ -10,6 +11,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     <>
       <PublicSiteHeader />
       {children}
+      <PublicLegalFooter />
     </>
   );
 }
