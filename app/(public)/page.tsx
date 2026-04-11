@@ -10,6 +10,8 @@ export default function HomePage() {
           <Link href="/login">Login</Link>
           <Link href="/signup">Sign up</Link>
           <Link href="/forgot-password">Forgot password</Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
         </nav>
       </section>
     </main>

@@ -175,7 +175,7 @@ Each slice should ship something real a user can see/use.
 - [x] **S66 - GA gated by consent state** [analytics]
   - Analytics activates only when consent allows.
 
-- [ ] **S67 - Legal pages published** [app]
+- [x] **S67 - Legal pages published** [app]
   - `/privacy`, `/terms`, and placeholder compliance pages accessible.
 
 - [ ] **S68 - Error tracking + security header diagnostics surface** [platform][security]
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S66 - GA gated by consent state`
+- [x] Current active slice: `S67 - Legal pages published`
 - [ ] Link PR/branch next to each completed slice.
