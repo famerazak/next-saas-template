@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { formatRateLimitMessage } from "@/lib/rate-limit";
 
 type InviteRole = "Admin" | "Member" | "Viewer";
 
@@ -25,7 +26,7 @@ function createInviteId() {
 }
 
 function parseInviteError(payload: { error?: string } | null, fallback: string) {
-  return payload?.error ?? fallback;
+  return formatRateLimitMessage(payload ?? {}, fallback);
 }
 
 export function TeamInviteForm({ tenantName, initialPendingInvites = [] }: TeamInviteFormProps) {
