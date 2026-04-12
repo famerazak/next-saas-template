@@ -200,7 +200,7 @@ Each slice should ship something real a user can see/use.
 
 ## Parallel QA/Release Tracking Tasks
 
-- [ ] **Q01 - E2E: account creation + login + dashboard access**
+- [x] **Q01 - E2E: account creation + login + dashboard access**
 - [ ] **Q02 - E2E: invite flow + role change + permissions gating**
 - [ ] **Q03 - E2E: owner-only billing + add card**
 - [ ] **Q04 - E2E: tenant audit logs + export**
@@ -213,5 +213,5 @@ Each slice should ship something real a user can see/use.
 
 ## Current Focus
 
-- [x] Current active slice: `S72 - “Starter ready” smoke flow`
+- [x] Current active slice: `Q01 - E2E: account creation + login + dashboard access`
 - [ ] Link PR/branch next to each completed slice.
